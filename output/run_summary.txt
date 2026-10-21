@@ -1,0 +1,10 @@
+Flight Delay Analysis completed.
+Run at: 2026-10-21 23:44:19
+Input: C:\Users\Animesh29\Desktop\BDA microproject\flight-delay-bda\data\raw\flights.csv
+Cleaned records: 7,049,800
+Delay threshold: arrival delay >= 15 minutes
+Minimum flights: airline/airport 100, route 50
+Parquet: C:\Users\Animesh29\Desktop\BDA microproject\flight-delay-bda\data\processed\flights_clean
+Summary CSVs: C:\Users\Animesh29\Desktop\BDA microproject\flight-delay-bda\output\powerbi
+Elapsed: 103.1 s
+Log: C:\Users\Animesh29\Desktop\BDA microproject\flight-delay-bda\logs\pipeline_20261021_234236.log

@@ -1,0 +1,1033 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flight Delay Analysis</title>
+<meta name="description" content="Flight delay patterns and airport network bottlenecks from U.S. BTS on-time performance data, processed with PySpark.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%232a78d6' d='M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z'/%3E%3C/svg%3E">
+<style>
+:root {
+  color-scheme: light;
+  --page: #f9f9f7;
+  --surface: #fcfcfb;
+  --surface-2: #f3f2ee;
+  --ink: #0b0b0b;
+  --ink-2: #52514e;
+  --muted: #6f6d68;
+  --axis-text: #898781;
+  --grid: #e1e0d9;
+  --baseline: #c3c2b7;
+  --border: rgba(11, 11, 11, 0.10);
+  --series-1: #2a78d6;
+  --series-1-wash: rgba(42, 120, 214, 0.10);
+  --series-2: #eb6834;
+  --series-1-hover: #1c5cab;
+  --critical: #d03b3b;
+  --warning-bg: #fff4dc;
+  --warning-ink: #6b4a00;
+  --focus: #2a78d6;
+  --shadow: 0 1px 2px rgba(11, 11, 11, 0.04), 0 8px 24px rgba(11, 11, 11, 0.05);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0d0d0d;
+    --surface: #1a1a19;
+    --surface-2: #232321;
+    --ink: #f0efec;
+    --ink-2: #c3c2b7;
+    --muted: #9c9a93;
+    --axis-text: #898781;
+    --grid: #2c2c2a;
+    --baseline: #383835;
+    --border: rgba(255, 255, 255, 0.10);
+    --series-1: #3987e5;
+    --series-1-wash: rgba(57, 135, 229, 0.14);
+    --series-2: #d95926;
+    --series-1-hover: #6da7ec;
+    --critical: #e66767;
+    --warning-bg: #3a2e12;
+    --warning-ink: #f5d690;
+    --focus: #6da7ec;
+    --shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0d0d0d;
+  --surface: #1a1a19;
+  --surface-2: #232321;
+  --ink: #f0efec;
+  --ink-2: #c3c2b7;
+  --muted: #9c9a93;
+  --axis-text: #898781;
+  --grid: #2c2c2a;
+  --baseline: #383835;
+  --border: rgba(255, 255, 255, 0.10);
+  --series-1: #3987e5;
+  --series-1-wash: rgba(57, 135, 229, 0.14);
+  --series-2: #d95926;
+  --series-1-hover: #6da7ec;
+  --critical: #e66767;
+  --warning-bg: #3a2e12;
+  --warning-ink: #f5d690;
+  --focus: #6da7ec;
+  --shadow: none;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--series-1); }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+@media (max-width: 640px) { .wrap { padding: 0 16px; } }
+
+/* Header */
+header.top { padding: 40px 0 8px; }
+.eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .02em; color: var(--muted); margin: 0 0 6px; }
+h1 { font-size: clamp(26px, 4vw, 36px); line-height: 1.15; margin: 0; letter-spacing: -0.02em; font-weight: 700; }
+.lede { color: var(--ink-2); margin: 10px 0 0; max-width: 68ch; }
+.meta-row { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 16px; font-size: 13px; color: var(--muted); }
+.meta-row span { display: inline-flex; gap: 6px; align-items: center; }
+.meta-row b { color: var(--ink-2); font-weight: 600; }
+.banner {
+  margin-top: 16px; padding: 10px 14px; border-radius: 10px;
+  background: var(--warning-bg); color: var(--warning-ink); font-size: 14px;
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.banner svg { flex: none; margin-top: 2px; }
+
+/* Nav */
+nav.sections {
+  position: sticky; top: 0; z-index: 20;
+  background: color-mix(in srgb, var(--page) 88%, transparent);
+  backdrop-filter: saturate(1.4) blur(10px);
+  border-bottom: 1px solid var(--border);
+  margin-top: 24px;
+}
+nav.sections .wrap { display: flex; align-items: center; gap: 4px; height: 52px; }
+.nav-links { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; flex: 1; min-width: 0; }
+.nav-links::-webkit-scrollbar { display: none; }
+.nav-links a {
+  color: var(--ink-2); text-decoration: none; font-size: 14px; font-weight: 500;
+  padding: 6px 12px; border-radius: 8px; white-space: nowrap;
+}
+.nav-links a:hover { background: var(--surface-2); color: var(--ink); }
+.nav-links a.active { color: var(--ink); background: var(--surface-2); }
+.icon-btn {
+  flex: none; width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--surface); display: grid; place-items: center; cursor: pointer; color: var(--ink-2);
+}
+.icon-btn:hover { color: var(--ink); background: var(--surface-2); }
+
+/* Sections */
+section.block { padding: 40px 0 8px; }
+.section-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+h2 { font-size: 22px; margin: 0; letter-spacing: -0.01em; }
+.section-sub { color: var(--muted); margin: 4px 0 0; font-size: 14px; max-width: 70ch; }
+.grid { display: grid; gap: 16px; }
+.grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 900px) { .grid.two { grid-template-columns: minmax(0, 1fr); } }
+
+.card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  padding: 20px; box-shadow: var(--shadow); min-width: 0;
+}
+.card-head { display: flex; justify-content: space-between; align-items: start; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+.card h3 { font-size: 15px; margin: 0; font-weight: 600; }
+.card .sub { font-size: 13px; color: var(--muted); margin: 2px 0 0; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+/* Segmented control */
+.seg { display: inline-flex; padding: 2px; border-radius: 9px; background: var(--surface-2); border: 1px solid var(--border); }
+.seg button {
+  border: 0; background: transparent; padding: 4px 10px; border-radius: 7px; cursor: pointer;
+  font-size: 13px; color: var(--ink-2); white-space: nowrap;
+}
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 0 0 1px var(--border); font-weight: 600; }
+.seg button:hover:not([aria-pressed="true"]) { color: var(--ink); }
+
+input[type="search"], select {
+  font: inherit; font-size: 13px; color: var(--ink); background: var(--surface);
+  border: 1px solid var(--border); border-radius: 8px; padding: 5px 10px; height: 32px;
+}
+input[type="search"] { width: 260px; max-width: 100%; }
+
+/* KPI */
+.kpis { display: grid; grid-template-columns: 1.3fr repeat(3, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 1000px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .kpis { grid-template-columns: minmax(0, 1fr); } }
+.hero { grid-row: span 2; display: flex; flex-direction: column; justify-content: space-between; }
+@media (max-width: 1000px) { .hero { grid-row: auto; grid-column: 1 / -1; } }
+.tile-label { font-size: 13px; color: var(--ink-2); margin: 0; }
+.hero-value { font-size: clamp(48px, 7vw, 64px); font-weight: 650; letter-spacing: -0.03em; line-height: 1; margin: 12px 0 8px; }
+.hero-value small { font-size: .45em; font-weight: 600; color: var(--ink-2); margin-left: 2px; }
+.tile-value { font-size: 28px; font-weight: 650; letter-spacing: -0.02em; margin: 6px 0 2px; line-height: 1.1; }
+.tile-note { font-size: 13px; color: var(--muted); margin: 0; }
+.meter { height: 8px; border-radius: 4px; background: var(--series-1-wash); overflow: hidden; margin-top: 16px; }
+.meter > i { display: block; height: 100%; background: var(--series-1); border-radius: 4px; }
+
+.findings { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.findings li { display: grid; grid-template-columns: 28px 1fr; gap: 10px; padding: 12px 0; border-top: 1px solid var(--border); }
+.findings li:first-child { border-top: 0; padding-top: 0; }
+.findings .q { font-size: 12px; font-weight: 700; color: var(--muted); padding-top: 2px; }
+.findings p { margin: 0; color: var(--ink-2); }
+.findings strong { color: var(--ink); font-weight: 600; }
+
+/* Charts */
+.chart { position: relative; width: 100%; }
+.chart svg { display: block; width: 100%; overflow: visible; }
+.chart text { font-size: 12px; fill: var(--axis-text); font-variant-numeric: tabular-nums; }
+.chart text.label { fill: var(--ink-2); }
+.chart text.label-strong { fill: var(--ink); font-weight: 600; }
+.chart text.value { fill: var(--ink-2); font-weight: 600; }
+.chart .gridline { stroke: var(--grid); stroke-width: 1; shape-rendering: crispEdges; }
+.chart .baseline { stroke: var(--baseline); stroke-width: 1; shape-rendering: crispEdges; }
+.chart .ref { stroke: var(--ink-2); stroke-width: 1; opacity: .55; }
+.chart text.halo { paint-order: stroke; stroke: var(--surface); stroke-width: 4px; stroke-linejoin: round; }
+.chart .mark { fill: var(--series-1); transition: fill .12s; }
+.chart .mark.alt { fill: var(--series-2); }
+.chart .hit { fill: transparent; cursor: default; }
+.chart .hit:hover + .mark, .chart .row:hover .mark, .chart .row:focus .mark { fill: var(--series-1-hover); }
+.chart .row:focus { outline: none; }
+.chart .row:focus .hit { stroke: var(--focus); stroke-width: 2; }
+.chart .line { fill: none; stroke: var(--series-1); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.chart .area { fill: var(--series-1-wash); }
+.chart .dot { fill: var(--series-1); stroke: var(--surface); stroke-width: 2; }
+.chart .crosshair { stroke: var(--baseline); stroke-width: 1; }
+.chart .scatter-dot { fill: var(--series-1); fill-opacity: .45; }
+.chart .scatter-dot.alt { fill: var(--series-2); fill-opacity: 1; stroke: var(--surface); stroke-width: 2; }
+.chart .scatter-dot.hover { fill-opacity: 1; stroke: var(--ink); stroke-width: 1.5; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink-2); margin-top: 10px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.legend i.line { width: 14px; height: 0; border-radius: 0; border-top: 1px solid var(--ink-2); opacity: .7; }
+
+.tooltip {
+  position: fixed; z-index: 50; pointer-events: none; min-width: 140px; max-width: 260px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .14); padding: 10px 12px; font-size: 13px;
+  opacity: 0; transform: translateY(4px); transition: opacity .1s, transform .1s;
+}
+.tooltip.show { opacity: 1; transform: none; }
+.tooltip .tt-title { font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+.tooltip .tt-row { display: flex; justify-content: space-between; gap: 16px; color: var(--muted); }
+.tooltip .tt-row b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* Tables */
+.table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; max-height: 480px; overflow-y: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { padding: 8px 12px; text-align: left; white-space: nowrap; border-bottom: 1px solid var(--border); }
+th { position: sticky; top: 0; background: var(--surface-2); color: var(--ink-2); font-weight: 600; z-index: 1; }
+th.sortable { cursor: pointer; user-select: none; }
+th.sortable:hover { color: var(--ink); }
+th .arrow { opacity: .6; margin-left: 4px; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr:hover td { background: var(--surface-2); }
+.cell-bar { display: inline-block; height: 6px; border-radius: 3px; background: var(--series-1); vertical-align: middle; margin-left: 8px; opacity: .8; }
+.empty { padding: 32px 16px; text-align: center; color: var(--muted); font-size: 14px; border: 1px dashed var(--border); border-radius: 10px; }
+
+.method dl { display: grid; grid-template-columns: minmax(140px, 220px) 1fr; gap: 10px 20px; margin: 0; }
+@media (max-width: 640px) { .method dl { grid-template-columns: 1fr; gap: 2px; } .method dd { margin-bottom: 10px; } }
+.method dt { font-weight: 600; font-size: 14px; }
+.method dd { margin: 0; color: var(--ink-2); font-size: 14px; }
+code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .9em; background: var(--surface-2); padding: 1px 5px; border-radius: 4px; }
+footer { padding: 32px 0 48px; color: var(--muted); font-size: 13px; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.error-box { margin: 80px auto; max-width: 560px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="tooltip" id="tooltip" role="status" aria-live="polite"></div>
+
+<script src="data.js"></script>
+<script>
+"use strict";
+(function () {
+  const app = document.getElementById("app");
+  const D = window.DASHBOARD_DATA;
+
+  if (!D) {
+    app.innerHTML = '<div class="wrap"><div class="card error-box"><h2>No data yet</h2>' +
+      '<p class="section-sub">Run the pipeline first, then reload this page:</p>' +
+      '<p><code>python src\\flight_delay_pipeline.py</code></p>' +
+      '<p class="section-sub">It writes <code>dashboard/data.js</code> next to this file.</p></div></div>';
+    return;
+  }
+
+  /* ---------- Theme ---------- */
+  const THEME_KEY = "flight-dashboard-theme";
+  function storedTheme() { try { return localStorage.getItem(THEME_KEY); } catch (e) { return null; } }
+  function applyTheme(theme) {
+    if (theme) document.documentElement.setAttribute("data-theme", theme);
+    else document.documentElement.removeAttribute("data-theme");
+  }
+  if (storedTheme()) applyTheme(storedTheme());
+  function isDark() {
+    const t = document.documentElement.getAttribute("data-theme");
+    if (t) return t === "dark";
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  }
+
+  /* ---------- Formatting ---------- */
+  const nf0 = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
+  const nf1 = new Intl.NumberFormat("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const fmt = {
+    int: v => v == null ? "–" : nf0.format(v),
+    pct: v => v == null ? "–" : nf1.format(v) + "%",
+    min: v => v == null ? "–" : nf1.format(v) + " min",
+    num1: v => v == null ? "–" : nf1.format(v),
+    compact(v) {
+      if (v == null) return "–";
+      const a = Math.abs(v);
+      if (a >= 1e9) return trimZero((v / 1e9).toFixed(1)) + "B";
+      if (a >= 1e6) return trimZero((v / 1e6).toFixed(1)) + "M";
+      if (a >= 1e3) return trimZero((v / 1e3).toFixed(a >= 1e4 ? 0 : 1)) + "K";
+      return nf0.format(v);
+    },
+  };
+  function trimZero(s) { return s.replace(/\.0$/, ""); }
+  const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  function monthLabel(ym, withYear) {
+    const [y, m] = String(ym).split("-");
+    return MONTHS[+m - 1] + (withYear ? " " + y : "");
+  }
+  function hourLabel(h) { return String(h).padStart(2, "0") + ":00"; }
+  function ymd(n) {
+    if (!n) return null;
+    const s = String(Math.round(n));
+    return new Date(+s.slice(0, 4), +s.slice(4, 6) - 1, +s.slice(6, 8));
+  }
+  function niceDate(d) { return d ? d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "–"; }
+
+  /* ---------- DOM helpers ---------- */
+  function el(tag, attrs, ...children) {
+    const node = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs || {})) {
+      if (v == null || v === false) continue;
+      if (k === "class") node.className = v;
+      else if (k === "text") node.textContent = v;
+      else if (k.startsWith("on")) node.addEventListener(k.slice(2), v);
+      else node.setAttribute(k, v === true ? "" : v);
+    }
+    for (const c of children.flat()) if (c != null) node.append(c.nodeType ? c : document.createTextNode(String(c)));
+    return node;
+  }
+  const SVGNS = "http://www.w3.org/2000/svg";
+  function s(tag, attrs, text) {
+    const node = document.createElementNS(SVGNS, tag);
+    for (const [k, v] of Object.entries(attrs || {})) if (v != null) node.setAttribute(k, v);
+    if (text != null) node.textContent = text;
+    return node;
+  }
+  function icon(path, size) {
+    const svg = s("svg", { width: size || 16, height: size || 16, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", "stroke-width": 2, "stroke-linecap": "round", "stroke-linejoin": "round", "aria-hidden": "true" });
+    svg.innerHTML = path;
+    return svg;
+  }
+  const ICONS = {
+    sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+    moon: '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
+    alert: '<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>',
+  };
+
+  /* ---------- Tooltip ---------- */
+  const tip = document.getElementById("tooltip");
+  function showTip(evt, title, rows) {
+    tip.replaceChildren(el("div", { class: "tt-title", text: title }),
+      ...rows.map(([k, v]) => el("div", { class: "tt-row" }, el("span", { text: k }), el("b", { text: v }))));
+    tip.classList.add("show");
+    moveTip(evt);
+  }
+  function moveTip(evt) {
+    let x, y;
+    if (evt && evt.clientX != null && evt.type !== "focus") { x = evt.clientX; y = evt.clientY; }
+    else if (evt && evt.target && evt.target.getBoundingClientRect) {
+      const r = evt.target.getBoundingClientRect(); x = r.left + r.width / 2; y = r.top;
+    } else return;
+    const w = tip.offsetWidth, h = tip.offsetHeight;
+    let left = x + 14, top = y - h - 12;
+    if (left + w > window.innerWidth - 8) left = x - w - 14;
+    if (left < 8) left = 8;
+    if (top < 8) top = y + 18;
+    tip.style.left = left + "px"; tip.style.top = top + "px";
+  }
+  function hideTip() { tip.classList.remove("show"); }
+  window.addEventListener("scroll", hideTip, { passive: true });
+
+  /* ---------- Scales ---------- */
+  function niceStep(v) {
+    const exp = Math.pow(10, Math.floor(Math.log10(v)));
+    const f = v / exp;
+    return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * exp;
+  }
+  // Axis from 0 to the first clean tick at or above the data maximum.
+  function niceScale(dataMax, count) {
+    if (!(dataMax > 0)) return { max: 1, ticks: [0, 1] };
+    const step = niceStep(dataMax / (count || 4));
+    const max = Math.ceil(dataMax / step - 1e-9) * step;
+    const out = [];
+    for (let t = 0; t <= max + 1e-9; t += step) out.push(+t.toFixed(10));
+    return { max, ticks: out };
+  }
+  function measureText(text) {
+    measureText.ctx = measureText.ctx || document.createElement("canvas").getContext("2d");
+    measureText.ctx.font = "12px system-ui, -apple-system, Segoe UI, sans-serif";
+    return measureText.ctx.measureText(text).width;
+  }
+  // Bar path with 4px rounded data-end, square at the baseline.
+  function hBarPath(x0, y, w, h, r) {
+    r = Math.min(r, w, h / 2);
+    if (w <= 0) return "";
+    return `M${x0},${y}H${x0 + w - r}Q${x0 + w},${y} ${x0 + w},${y + r}V${y + h - r}Q${x0 + w},${y + h} ${x0 + w - r},${y + h}H${x0}Z`;
+  }
+  function vBarPath(x, y0, w, h, r) {
+    r = Math.min(r, h, w / 2);
+    if (h <= 0) return "";
+    return `M${x},${y0}V${y0 - h + r}Q${x},${y0 - h} ${x + r},${y0 - h}H${x + w - r}Q${x + w},${y0 - h} ${x + w},${y0 - h + r}V${y0}Z`;
+  }
+
+  /* ---------- Charts ---------- */
+  // Horizontal bars: ranked categories.
+  function hBarChart(host, rows, opt) {
+    host.replaceChildren();
+    if (!rows.length) { host.append(emptyNote(opt.empty)); return; }
+    const width = host.clientWidth || 600;
+    const band = 30, bar = 16;
+    const labelW = Math.min(Math.max(...rows.map(r => measureText(opt.label(r)))) + 12, width * 0.42, 220);
+    const valueW = Math.max(...rows.map(r => measureText(opt.fmt(opt.value(r))))) + 12;
+    const plotW = Math.max(40, width - labelW - valueW);
+    const scale = niceScale(Math.max(...rows.map(opt.value), 0), width < 500 ? 3 : 5), max = scale.max;
+    const height = rows.length * band + 24;
+    const svg = s("svg", { viewBox: `0 0 ${width} ${height}`, height, role: "img", "aria-label": opt.aria });
+    const g = s("g", { transform: `translate(${labelW},0)` });
+    scale.ticks.forEach(t => {
+      const x = Math.round(t / max * plotW) + 0.5;
+      g.append(s("line", { class: "gridline", x1: x, x2: x, y1: 0, y2: rows.length * band }));
+      g.append(s("text", { x, y: rows.length * band + 16, "text-anchor": "middle" }, opt.tick ? opt.tick(t) : fmt.compact(t)));
+    });
+    rows.forEach((r, i) => {
+      const v = opt.value(r) || 0;
+      const y = i * band + (band - bar) / 2;
+      const w = Math.max(v / max * plotW, v > 0 ? 2 : 0);
+      const row = s("g", { class: "row", tabindex: 0, role: "listitem", "aria-label": `${opt.label(r)}: ${opt.fmt(v)}` });
+      row.append(s("rect", { class: "hit", x: -labelW, y: i * band, width: labelW + plotW + valueW, height: band }));
+      row.append(s("path", { class: "mark" + (opt.highlight && opt.highlight(r) ? " alt" : ""), d: hBarPath(0, y, w, bar, 4) }));
+      row.append(s("text", { class: "label", x: -10, y: y + bar / 2 + 4, "text-anchor": "end" }, opt.label(r)));
+      row.append(s("text", { class: "value", x: w + 6, y: y + bar / 2 + 4 }, opt.fmt(v)));
+      const tt = e => showTip(e, opt.title ? opt.title(r) : opt.label(r), opt.tooltip(r));
+      row.addEventListener("pointerenter", tt); row.addEventListener("pointermove", moveTip);
+      row.addEventListener("pointerleave", hideTip); row.addEventListener("focus", tt); row.addEventListener("blur", hideTip);
+      g.append(row);
+    });
+    g.append(s("line", { class: "baseline", x1: 0.5, x2: 0.5, y1: 0, y2: rows.length * band }));
+    svg.append(g);
+    host.append(svg);
+  }
+
+  // Vertical columns: ordered categories (hours, weekdays, months).
+  function columnChart(host, rows, opt) {
+    host.replaceChildren();
+    if (!rows.length) { host.append(emptyNote(opt.empty)); return; }
+    const width = host.clientWidth || 600, height = opt.height || 240;
+    const m = { t: 20, r: 8, b: 28, l: 40 };
+    const pw = width - m.l - m.r, ph = height - m.t - m.b;
+    const scale = niceScale(Math.max(...rows.map(opt.value), 0) * 1.08, 4), max = scale.max;
+    const bandW = pw / rows.length;
+    const barW = Math.max(2, Math.min(24, bandW - 2));
+    const svg = s("svg", { viewBox: `0 0 ${width} ${height}`, height, role: "img", "aria-label": opt.aria });
+    const g = s("g", { transform: `translate(${m.l},${m.t})` });
+    scale.ticks.forEach(t => {
+      const y = Math.round(ph - t / max * ph) + 0.5;
+      g.append(s("line", { class: "gridline", x1: 0, x2: pw, y1: y, y2: y }));
+      g.append(s("text", { x: -8, y: y + 4, "text-anchor": "end" }, opt.tick ? opt.tick(t) : fmt.compact(t)));
+    });
+    const maxV = Math.max(...rows.map(opt.value));
+    const labelEvery = Math.ceil(rows.length / Math.max(1, Math.floor(pw / 44)));
+    rows.forEach((r, i) => {
+      const v = opt.value(r) || 0, h = v / max * ph;
+      const x = i * bandW + (bandW - barW) / 2;
+      const row = s("g", { class: "row", tabindex: 0, role: "listitem", "aria-label": `${opt.label(r)}: ${opt.fmt(v)}` });
+      row.append(s("rect", { class: "hit", x: i * bandW, y: 0, width: bandW, height: ph }));
+      row.append(s("path", { class: "mark", d: vBarPath(x, ph, barW, h, 4) }));
+      if (v === maxV) row.append(s("text", { class: "value", x: x + barW / 2, y: ph - h - 6, "text-anchor": "middle" }, opt.fmt(v)));
+      const tt = e => showTip(e, opt.title ? opt.title(r) : opt.label(r), opt.tooltip(r));
+      row.addEventListener("pointerenter", tt); row.addEventListener("pointermove", moveTip);
+      row.addEventListener("pointerleave", hideTip); row.addEventListener("focus", tt); row.addEventListener("blur", hideTip);
+      g.append(row);
+      if (i % labelEvery === 0) g.append(s("text", { x: i * bandW + bandW / 2, y: ph + 18, "text-anchor": "middle" }, opt.short ? opt.short(r) : opt.label(r)));
+    });
+    g.append(s("line", { class: "baseline", x1: 0, x2: pw, y1: ph + 0.5, y2: ph + 0.5 }));
+    svg.append(g);
+    host.append(svg);
+  }
+
+  // Line over time with crosshair readout.
+  function lineChart(host, rows, opt) {
+    host.replaceChildren();
+    if (!rows.length) { host.append(emptyNote(opt.empty)); return; }
+    const width = host.clientWidth || 600, height = opt.height || 260;
+    const m = { t: 24, r: 56, b: 28, l: 40 };
+    const pw = width - m.l - m.r, ph = height - m.t - m.b;
+    const vals = rows.map(opt.value);
+    const scale = niceScale(Math.max(...vals, opt.ref || 0) * 1.1, 4), max = scale.max;
+    const X = i => rows.length === 1 ? pw / 2 : i / (rows.length - 1) * pw;
+    const Y = v => ph - v / max * ph;
+    const svg = s("svg", { viewBox: `0 0 ${width} ${height}`, height, role: "img", "aria-label": opt.aria });
+    const g = s("g", { transform: `translate(${m.l},${m.t})` });
+    scale.ticks.forEach(t => {
+      const y = Math.round(Y(t)) + 0.5;
+      g.append(s("line", { class: "gridline", x1: 0, x2: pw, y1: y, y2: y }));
+      g.append(s("text", { x: -8, y: y + 4, "text-anchor": "end" }, opt.tick ? opt.tick(t) : fmt.compact(t)));
+    });
+    const labelEvery = Math.ceil(rows.length / Math.max(1, Math.floor(pw / 56)));
+    rows.forEach((r, i) => {
+      if (i % labelEvery === 0 || i === rows.length - 1 && rows.length < 14)
+        g.append(s("text", { x: X(i), y: ph + 18, "text-anchor": i === 0 ? "start" : i === rows.length - 1 ? "end" : "middle" }, opt.short(r, i)));
+    });
+    const pts = rows.map((r, i) => [X(i), Y(opt.value(r) || 0)]);
+    const line = pts.map((p, i) => (i ? "L" : "M") + p[0].toFixed(1) + "," + p[1].toFixed(1)).join("");
+    g.append(s("path", { class: "area", d: line + `L${pts[pts.length - 1][0]},${ph}L${pts[0][0]},${ph}Z` }));
+    g.append(s("line", { class: "baseline", x1: 0, x2: pw, y1: ph + 0.5, y2: ph + 0.5 }));
+    if (opt.ref != null) {
+      const y = Y(opt.ref);
+      g.append(s("line", { class: "ref", x1: 0, x2: pw, y1: y, y2: y }));
+      g.append(s("text", { x: pw + 6, y: y + 4 }, opt.refLabel));
+    }
+    g.append(s("path", { class: "line", d: line }));
+    // Label the peak and the last point only.
+    const peak = vals.indexOf(Math.max(...vals));
+    const last = rows.length - 1;
+    // Skip the peak label when it would crowd the end label.
+    const labelled = peak !== last && Math.abs(pts[peak][0] - pts[last][0]) < 56 ? [last] : [peak, last];
+    labelled.filter((v, i, a) => a.indexOf(v) === i).forEach(i => {
+      g.append(s("circle", { class: "dot", cx: pts[i][0], cy: pts[i][1], r: 4.5 }));
+      g.append(s("text", { class: "value", x: pts[i][0], y: pts[i][1] - 10, "text-anchor": "middle" }, opt.fmt(vals[i])));
+    });
+    const cross = s("line", { class: "crosshair", y1: 0, y2: ph, visibility: "hidden" });
+    const hoverDot = s("circle", { class: "dot", r: 5, visibility: "hidden" });
+    g.append(cross, hoverDot);
+    const overlay = s("rect", { x: 0, y: 0, width: pw, height: ph, fill: "transparent", tabindex: 0, "aria-label": "Use left and right arrow keys to read values" });
+    let active = -1;
+    function activate(i, evt) {
+      active = Math.max(0, Math.min(rows.length - 1, i));
+      const [x, y] = pts[active];
+      cross.setAttribute("x1", x); cross.setAttribute("x2", x); cross.setAttribute("visibility", "visible");
+      hoverDot.setAttribute("cx", x); hoverDot.setAttribute("cy", y); hoverDot.setAttribute("visibility", "visible");
+      showTip(evt, opt.title(rows[active]), opt.tooltip(rows[active]));
+    }
+    function clear() { cross.setAttribute("visibility", "hidden"); hoverDot.setAttribute("visibility", "hidden"); hideTip(); }
+    overlay.addEventListener("pointermove", e => {
+      const rect = overlay.getBoundingClientRect();
+      const px = (e.clientX - rect.left) / rect.width * pw;
+      activate(rows.length === 1 ? 0 : Math.round(px / pw * (rows.length - 1)), e);
+    });
+    overlay.addEventListener("pointerleave", clear);
+    overlay.addEventListener("blur", clear);
+    overlay.addEventListener("keydown", e => {
+      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      e.preventDefault();
+      const i = active < 0 ? 0 : active + (e.key === "ArrowRight" ? 1 : -1);
+      const rect = overlay.getBoundingClientRect();
+      activate(i, { clientX: rect.left + X(Math.max(0, Math.min(rows.length - 1, i))) / pw * rect.width, clientY: rect.top + 20 });
+    });
+    g.append(overlay);
+    svg.append(g);
+    host.append(svg);
+  }
+
+  // Scatter: route volume (log x) vs delay rate, nearest-point hover.
+  function scatterChart(host, rows, opt) {
+    host.replaceChildren();
+    if (!rows.length) { host.append(emptyNote(opt.empty)); return; }
+    const width = host.clientWidth || 600, height = opt.height || 360;
+    const m = { t: 16, r: 16, b: 40, l: 44 };
+    const pw = width - m.l - m.r, ph = height - m.t - m.b;
+    const xs = rows.map(opt.x), ys = rows.map(opt.y);
+    const xMin = Math.max(1, Math.min(...xs)), xMax = Math.max(...xs);
+    const lx0 = Math.log10(xMin * 0.9), lx1 = Math.log10(xMax * 1.1);
+    const yScale = niceScale(Math.max(...ys) * 1.05, 4), yMax = yScale.max;
+    const X = v => (Math.log10(Math.max(v, 1)) - lx0) / Math.max(1e-9, lx1 - lx0) * pw;
+    const Y = v => ph - v / yMax * ph;
+    const svg = s("svg", { viewBox: `0 0 ${width} ${height}`, height, role: "img", "aria-label": opt.aria });
+    const g = s("g", { transform: `translate(${m.l},${m.t})` });
+    yScale.ticks.forEach(t => {
+      const y = Math.round(Y(t)) + 0.5;
+      g.append(s("line", { class: "gridline", x1: 0, x2: pw, y1: y, y2: y }));
+      g.append(s("text", { x: -8, y: y + 4, "text-anchor": "end" }, t + "%"));
+    });
+    for (let p = Math.floor(lx0); p <= Math.ceil(lx1); p++) {
+      [1, 2, 5].forEach(k => {
+        const v = k * Math.pow(10, p);
+        if (v < Math.pow(10, lx0) || v > Math.pow(10, lx1)) return;
+        if (pw < 420 && k === 2) return;
+        const x = Math.round(X(v)) + 0.5;
+        if (k === 1) g.append(s("line", { class: "gridline", x1: x, x2: x, y1: 0, y2: ph }));
+        g.append(s("text", { x, y: ph + 18, "text-anchor": "middle" }, fmt.compact(v)));
+      });
+    }
+    g.append(s("text", { x: pw, y: ph + 34, "text-anchor": "end" }, "Flights on route (log scale) →"));
+    g.append(s("line", { class: "baseline", x1: 0, x2: pw, y1: ph + 0.5, y2: ph + 0.5 }));
+    if (opt.ref != null) {
+      const y = Y(opt.ref);
+      g.append(s("line", { class: "ref", x1: 0, x2: pw, y1: y, y2: y }));
+      var refText = s("text", { x: 6, y: y - 6, class: "label halo" }, opt.refLabel);
+    }
+    const pts = rows.map(r => ({ r, x: X(opt.x(r)), y: Y(opt.y(r)), hi: opt.highlight(r) }));
+    const base = s("g"), top = s("g"), labels = s("g");
+    pts.forEach(p => {
+      const c = s("circle", { class: "scatter-dot" + (p.hi ? " alt" : ""), cx: p.x.toFixed(1), cy: p.y.toFixed(1), r: p.hi ? 5 : 3 });
+      p.node = c;
+      (p.hi ? top : base).append(c);
+    });
+    // Label the highlighted points, skipping any label that would collide with one already placed.
+    const placed = [];
+    pts.filter(p => p.hi).slice(0, opt.labelCount || 5).forEach(p => {
+      const text = opt.label(p.r), w = measureText(text);
+      const right = p.x + w + 10 < pw;
+      const x0 = right ? p.x + 8 : p.x - 8 - w, box = [x0 - 2, p.y - 18, x0 + w + 2, p.y - 2];
+      if (placed.some(b => box[0] < b[2] && b[0] < box[2] && box[1] < b[3] && b[1] < box[3])) return;
+      placed.push(box);
+      labels.append(s("text", { class: "label-strong halo", x: p.x + (right ? 8 : -8), y: p.y - 6, "text-anchor": right ? "start" : "end" }, text));
+    });
+    g.append(base, top, labels);
+    if (refText) g.append(refText);
+    const overlay = s("rect", { x: 0, y: 0, width: pw, height: ph, fill: "transparent" });
+    let hovered = null;
+    overlay.addEventListener("pointermove", e => {
+      const rect = overlay.getBoundingClientRect();
+      const mx = (e.clientX - rect.left) / rect.width * pw, my = (e.clientY - rect.top) / rect.height * ph;
+      let best = null, bd = 24 * 24;
+      for (const p of pts) { const d = (p.x - mx) ** 2 + (p.y - my) ** 2; if (d < bd) { bd = d; best = p; } }
+      if (hovered && hovered !== best) hovered.node.classList.remove("hover");
+      hovered = best;
+      if (best) { best.node.classList.add("hover"); best.node.parentNode.append(best.node); showTip(e, opt.title(best.r), opt.tooltip(best.r)); }
+      else hideTip();
+    });
+    overlay.addEventListener("pointerleave", () => { if (hovered) hovered.node.classList.remove("hover"); hovered = null; hideTip(); });
+    g.append(overlay);
+    svg.append(g);
+    host.append(svg);
+  }
+
+  function emptyNote(text) {
+    return el("div", { class: "empty", text: text || "No rows met the minimum-volume threshold. Run the pipeline on more data." });
+  }
+
+  /* ---------- Sortable table ---------- */
+  function dataTable(host, rows, columns, opt) {
+    opt = opt || {};
+    let sortKey = opt.sortKey || null, dir = opt.dir || -1;
+    let query = "";
+    const wrap = el("div", { class: "table-wrap" });
+    const searchBox = opt.search ? el("input", { type: "search", placeholder: opt.search, "aria-label": opt.search }) : null;
+    function render() {
+      let data = rows.slice();
+      if (query) {
+        const q = query.toLowerCase();
+        data = data.filter(r => columns.some(c => String(c.get(r) ?? "").toLowerCase().includes(q)));
+      }
+      if (sortKey) {
+        const col = columns.find(c => c.key === sortKey);
+        data.sort((a, b) => {
+          const va = col.get(a), vb = col.get(b);
+          if (va == null) return 1; if (vb == null) return -1;
+          return (typeof va === "number" ? va - vb : String(va).localeCompare(String(vb))) * dir;
+        });
+      }
+      const limit = opt.limit || 500;
+      const thead = el("thead", {}, el("tr", {}, columns.map(c => {
+        const th = el("th", { class: (c.num ? "num " : "") + "sortable", scope: "col", tabindex: 0,
+          "aria-sort": sortKey === c.key ? (dir > 0 ? "ascending" : "descending") : "none" }, c.title,
+          sortKey === c.key ? el("span", { class: "arrow", text: dir > 0 ? "↑" : "↓" }) : null);
+        const sortBy = () => { if (sortKey === c.key) dir = -dir; else { sortKey = c.key; dir = c.num ? -1 : 1; } render(); };
+        th.addEventListener("click", sortBy);
+        th.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); sortBy(); } });
+        return th;
+      })));
+      const barMax = {};
+      columns.filter(c => c.bar).forEach(c => { barMax[c.key] = Math.max(...rows.map(r => c.get(r) || 0)) || 1; });
+      const tbody = el("tbody", {}, data.slice(0, limit).map(r => el("tr", {}, columns.map(c => {
+        const v = c.get(r);
+        const td = el("td", { class: c.num ? "num" : null }, c.fmt ? c.fmt(v) : (v ?? "–"));
+        if (c.bar) td.append(el("span", { class: "cell-bar", style: `width:${Math.round((v || 0) / barMax[c.key] * 48)}px` }));
+        return td;
+      }))));
+      const table = el("table", {}, thead, tbody);
+      if (data.length > limit) table.append(el("caption", { class: "visually-hidden", text: `Showing first ${limit} rows` }));
+      wrap.replaceChildren(data.length ? table : emptyNote(query ? "No rows match your search." : opt.empty));
+    }
+    if (searchBox) searchBox.addEventListener("input", () => { query = searchBox.value.trim(); render(); });
+    render();
+    host.replaceChildren(...[searchBox ? el("div", { class: "controls", style: "margin-bottom:10px" }, searchBox) : null, wrap].filter(Boolean));
+  }
+
+  /* ---------- Card with chart/table toggle ---------- */
+  const renderers = [];
+  function card({ title, sub, controls, draw, table, legend }) {
+    const chartHost = el("div", { class: "chart" });
+    const tableHost = el("div", { hidden: true });
+    let mode = "chart";
+    const seg = el("div", { class: "seg", role: "group", "aria-label": "View" });
+    const btns = ["chart", "table"].map(m => el("button", { type: "button", "aria-pressed": String(m === mode), text: m === "chart" ? "Chart" : "Table",
+      onclick: () => { mode = m; btns.forEach(b => b.setAttribute("aria-pressed", String(b.textContent.toLowerCase() === m))); sync(); } }));
+    seg.append(...btns);
+    function sync() {
+      chartHost.hidden = mode !== "chart"; tableHost.hidden = mode !== "table";
+      if (legendNode) legendNode.hidden = mode !== "chart";
+      if (mode === "chart") draw(chartHost); else table(tableHost);
+    }
+    const legendNode = legend ? el("div", { class: "legend" }, legend) : null;
+    const node = el("div", { class: "card" },
+      el("div", { class: "card-head" },
+        el("div", {}, el("h3", { text: title }), sub ? el("p", { class: "sub", text: sub }) : null),
+        el("div", { class: "controls" }, controls || null, seg)),
+      chartHost, legendNode, tableHost);
+    const api = { node, redraw: () => { if (mode === "chart") draw(chartHost); else table(tableHost); } };
+    renderers.push(api);
+    return api;
+  }
+  function segmented(options, initial, onChange, label) {
+    let value = initial;
+    const group = el("div", { class: "seg", role: "group", "aria-label": label });
+    const buttons = options.map(([v, text]) => el("button", { type: "button", "aria-pressed": String(v === value), text,
+      onclick: () => { value = v; buttons.forEach((b, i) => b.setAttribute("aria-pressed", String(options[i][0] === v))); onChange(v); } }));
+    group.append(...buttons);
+    return group;
+  }
+
+  /* ---------- Data prep ---------- */
+  const K = D.kpi || {};
+  const meta = D.meta || {};
+  const monthly = (D.monthly || []).slice().sort((a, b) => String(a.year_month).localeCompare(String(b.year_month)));
+  const hourly = (D.hourly || []).slice().sort((a, b) => a.scheduled_departure_hour - b.scheduled_departure_hour);
+  const weekday = (D.weekday || []).slice().sort((a, b) => a.day_of_week - b.day_of_week);
+  const airlines = D.airlines || [];
+  const origins = D.origins || [];
+  const destinations = D.destinations || [];
+  const routes = D.routes || [];
+  const causes = (D.causes || []).slice().sort((a, b) => b.total_reported_delay_minutes - a.total_reported_delay_minutes);
+  const overallRate = K.arrival_delay_rate_pct;
+  const firstDate = ymd(K.first_flight_date_yyyymmdd), lastDate = ymd(K.last_flight_date_yyyymmdd);
+  const multiYear = monthly.length && String(monthly[0].year_month).slice(0, 4) !== String(monthly[monthly.length - 1].year_month).slice(0, 4);
+  const byDesc = key => (a, b) => (b[key] ?? -Infinity) - (a[key] ?? -Infinity);
+  const maxBy = (arr, key) => arr.length ? arr.reduce((m, r) => (r[key] ?? -Infinity) > (m[key] ?? -Infinity) ? r : m) : null;
+  const priorityRoutes = routes.slice().sort(byDesc("priority_score"));
+  const priorityTop = new Set(priorityRoutes.slice(0, 10).map(r => r.route));
+  const airportName = (code, city) => city ? `${code} · ${city}` : code;
+
+  /* ---------- Header ---------- */
+  const themeBtn = el("button", { class: "icon-btn", type: "button", "aria-label": "Toggle dark mode" });
+  function syncThemeIcon() { themeBtn.replaceChildren(icon(isDark() ? ICONS.sun : ICONS.moon)); }
+  themeBtn.addEventListener("click", () => {
+    const next = isDark() ? "light" : "dark";
+    applyTheme(next);
+    try { localStorage.setItem(THEME_KEY, next); } catch (e) { /* ignore */ }
+    syncThemeIcon();
+  });
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", syncThemeIcon);
+  syncThemeIcon();
+
+  const NAV = [["overview", "Overview"], ["time", "Time patterns"], ["airlines", "Airlines"], ["airports", "Airports"], ["routes", "Routes"], ["causes", "Causes"], ["method", "Method"]];
+  const navLinks = NAV.map(([id, label]) => el("a", { href: "#" + id, text: label }));
+
+  const header = el("header", { class: "top" }, el("div", { class: "wrap" },
+    el("p", { class: "eyebrow", text: "Big Data Analytics · PySpark pipeline" }),
+    el("h1", { text: "Flight delays & airport network bottlenecks" }),
+    el("p", { class: "lede", text: "Where and when U.S. flights arrive late — by month, hour, airline, airport and route — with flight volume shown beside every rate so busy airports aren't confused with bad ones." }),
+    el("div", { class: "meta-row" },
+      el("span", {}, "Period ", el("b", { text: firstDate ? `${niceDate(firstDate)} – ${niceDate(lastDate)}` : (meta.period || "–") })),
+      el("span", {}, "Source ", el("b", { text: meta.synthetic ? "Synthetic sample" : "U.S. BTS On-Time Performance" })),
+      el("span", {}, "Delayed = ", el("b", { text: "arrival ≥ 15 min late" })),
+      el("span", {}, "Updated ", el("b", { text: meta.generated_at || "–" }))),
+    meta.synthetic ? el("div", { class: "banner", role: "note" }, icon(ICONS.alert),
+      el("span", {}, el("b", { text: "Synthetic data. " }), "These numbers come from a generated test sample and are not real-world evidence. Run ", el("code", { text: "src/download_bts_data.py" }), " for official BTS data.")) : null));
+  const nav = el("nav", { class: "sections", "aria-label": "Sections" }, el("div", { class: "wrap" }, el("div", { class: "nav-links" }, navLinks), themeBtn));
+
+  /* ---------- Overview ---------- */
+  function tile(label, value, note) {
+    return el("div", { class: "card" }, el("p", { class: "tile-label", text: label }), el("p", { class: "tile-value", text: value }), note ? el("p", { class: "tile-note", text: note }) : null);
+  }
+  const hero = el("div", { class: "card hero" },
+    el("div", {},
+      el("p", { class: "tile-label", text: "Arrival delay rate" }),
+      el("p", { class: "hero-value" }, nf1.format(overallRate || 0), el("small", { text: "%" })),
+      el("p", { class: "tile-note", text: `${fmt.int(K.arrival_delayed_flights_15_min_or_more)} of ${fmt.int(K.operated_flights_with_arrival_data)} operated flights arrived 15+ minutes late.` })),
+    el("div", { class: "meter", role: "img", "aria-label": `${fmt.pct(overallRate)} of flights delayed` }, el("i", { style: `width:${Math.min(100, overallRate || 0)}%` })));
+
+  const kpis = el("div", { class: "kpis" }, hero,
+    tile("Flights analysed", fmt.compact(K.cleaned_records), `${fmt.int(K.cleaned_records)} cleaned records`),
+    tile("Average arrival delay", fmt.min(K.average_arrival_delay_min), "Early arrivals count as negative"),
+    tile("Cancelled", fmt.compact(K.cancelled_flights), `${fmt.pct(K.cancellation_rate_pct)} of scheduled flights`),
+    tile("Diverted", fmt.compact(K.diverted_flights), "Excluded from the delay-rate denominator"),
+    tile("Network", `${fmt.int(K.origin_airports)} airports`, `${fmt.int(K.airlines)} airlines · ${fmt.compact(K.routes)} routes`),
+    tile("Delayed arrivals", fmt.compact(K.arrival_delayed_flights_15_min_or_more), "Operated flights ≥ 15 min late"));
+
+  function finding(q, ...parts) { return el("li", {}, el("span", { class: "q", text: q }), el("p", {}, ...parts)); }
+  const worstMonth = maxBy(monthly, "arrival_delay_rate_pct"), bestMonth = monthly.length ? monthly.reduce((m, r) => r.arrival_delay_rate_pct < m.arrival_delay_rate_pct ? r : m) : null;
+  const worstAirline = maxBy(airlines, "arrival_delay_rate_pct");
+  const worstOrigin = maxBy(origins, "priority_score"), worstDest = maxBy(destinations, "priority_score");
+  const worstHour = maxBy(hourly, "arrival_delay_rate_pct"), bestHour = hourly.length ? hourly.reduce((m, r) => r.arrival_delay_rate_pct < m.arrival_delay_rate_pct ? r : m) : null;
+  const topCause = causes[0];
+  const topRoute = priorityRoutes[0];
+  const items = [];
+  if (worstMonth) items.push(finding("Q1", "The worst month was ", el("strong", { text: monthLabel(worstMonth.year_month, true) }), ` at ${fmt.pct(worstMonth.arrival_delay_rate_pct)} delayed; the best was ${monthLabel(bestMonth.year_month, true)} at ${fmt.pct(bestMonth.arrival_delay_rate_pct)}.`));
+  if (worstAirline) items.push(finding("Q2", el("strong", { text: worstAirline.airline_name || worstAirline.airline }), ` had the highest delay rate (${fmt.pct(worstAirline.arrival_delay_rate_pct)}) across ${fmt.int(worstAirline.flights)} flights.`));
+  if (worstOrigin) items.push(finding("Q3", "Highest-priority departure hotspot: ", el("strong", { text: airportName(worstOrigin.origin, worstOrigin.origin_city) }), ` — ${fmt.pct(worstOrigin.departure_delay_rate_pct)} of ${fmt.int(worstOrigin.flights)} departures late.`));
+  if (worstDest) items.push(finding("Q4", "Highest-priority arrival hotspot: ", el("strong", { text: airportName(worstDest.destination, worstDest.destination_city) }), ` — ${fmt.pct(worstDest.arrival_delay_rate_pct)} of ${fmt.int(worstDest.flights)} arrivals late.`));
+  if (topRoute) {
+    // Busy routes = top quartile by volume, so a tiny route with an extreme rate can't win.
+    const volumes = routes.map(r => r.flights).sort((a, b) => a - b);
+    const busyMin = volumes[Math.floor(volumes.length * 0.75)] || 0;
+    const busyWorst = maxBy(routes.filter(r => r.flights >= busyMin), "arrival_delay_rate_pct") || topRoute;
+    items.push(finding("Q5", "Among busy routes (top 25% by volume, ", fmt.int(busyMin), "+ flights), ", el("strong", { text: busyWorst.route }),
+      ` has the highest delay rate: ${fmt.pct(busyWorst.arrival_delay_rate_pct)} of ${fmt.int(busyWorst.flights)} flights. By priority score the top route is ${topRoute.route}.`));
+  }
+  if (worstHour) items.push(finding("Q6", "Departures scheduled around ", el("strong", { text: hourLabel(worstHour.scheduled_departure_hour) }), ` are delayed most (${fmt.pct(worstHour.arrival_delay_rate_pct)}); ${hourLabel(bestHour.scheduled_departure_hour)} is the most punctual (${fmt.pct(bestHour.arrival_delay_rate_pct)}).`));
+  if (topCause && topCause.total_reported_delay_minutes > 0) items.push(finding("Q7", el("strong", { text: topCause.delay_cause }), ` accounts for the most reported delay minutes (${fmt.pct(topCause.share_of_reported_minutes_pct)} of ${fmt.compact(causes.reduce((t, c) => t + c.total_reported_delay_minutes, 0))} min).`));
+  items.push(finding("Q8", `${fmt.int(K.cancelled_flights)} cancelled and ${fmt.int(K.diverted_flights)} diverted flights have no normal arrival delay, so they are `, el("strong", { text: "excluded from the delay rate" }), " and reported separately."));
+
+  const overview = el("section", { class: "block", id: "overview" }, el("div", { class: "wrap" },
+    kpis,
+    el("div", { class: "card", style: "margin-top:16px" },
+      el("div", { class: "card-head" }, el("div", {}, el("h3", { text: "Key findings" }), el("p", { class: "sub", text: "Answers to the project questions, computed from this run. Patterns, not proof of cause." }))),
+      el("ul", { class: "findings" }, items))));
+
+  /* ---------- Time patterns ---------- */
+  const rateTooltip = r => [["Delay rate", fmt.pct(r.arrival_delay_rate_pct)], ["Flights", fmt.int(r.flights ?? r.operated_flights_with_arrival_data)], ["Avg arrival delay", fmt.min(r.average_arrival_delay_min)]];
+  const monthCard = card({
+    title: "Monthly arrival delay rate", sub: "Share of operated flights arriving 15+ minutes late",
+    draw: h => lineChart(h, monthly, { value: r => r.arrival_delay_rate_pct, fmt: fmt.pct, tick: t => t + "%", ref: overallRate, refLabel: "avg",
+      short: (r, i) => monthLabel(r.year_month, multiYear && (i === 0 || String(r.year_month).endsWith("-01"))),
+      title: r => monthLabel(r.year_month, true), tooltip: r => [...rateTooltip(r), ["Median delay", fmt.min(r.median_arrival_delay_min)]],
+      aria: "Line chart of monthly arrival delay rate" }),
+    table: h => dataTable(h, monthly, [
+      { key: "m", title: "Month", get: r => r.year_month },
+      { key: "f", title: "Operated flights", num: true, get: r => r.operated_flights_with_arrival_data, fmt: fmt.int },
+      { key: "d", title: "Delayed", num: true, get: r => r.arrival_delayed_flights, fmt: fmt.int },
+      { key: "r", title: "Delay rate", num: true, get: r => r.arrival_delay_rate_pct, fmt: fmt.pct, bar: true },
+      { key: "a", title: "Avg delay", num: true, get: r => r.average_arrival_delay_min, fmt: fmt.min },
+      { key: "md", title: "Median delay", num: true, get: r => r.median_arrival_delay_min, fmt: fmt.min },
+      { key: "c", title: "Cancel rate", num: true, get: r => r.cancellation_rate_pct, fmt: fmt.pct }], { sortKey: "m", dir: 1 }),
+  });
+  const cancelCard = card({
+    title: "Monthly cancellation rate", sub: "Cancelled ÷ scheduled flights — tracked separately from delays",
+    draw: h => columnChart(h, monthly, { value: r => r.cancellation_rate_pct || 0, fmt: fmt.pct, tick: t => t + "%", height: 260,
+      label: r => monthLabel(r.year_month, true), short: r => monthLabel(r.year_month),
+      tooltip: r => [["Cancel rate", fmt.pct(r.cancellation_rate_pct)], ["Cancelled", fmt.int(r.cancelled_flights)], ["Scheduled", fmt.int(r.scheduled_flights)], ["Diverted", fmt.int(r.diverted_flights)]],
+      aria: "Column chart of monthly cancellation rate" }),
+    table: h => dataTable(h, monthly, [
+      { key: "m", title: "Month", get: r => r.year_month },
+      { key: "s", title: "Scheduled", num: true, get: r => r.scheduled_flights, fmt: fmt.int },
+      { key: "c", title: "Cancelled", num: true, get: r => r.cancelled_flights, fmt: fmt.int },
+      { key: "r", title: "Cancel rate", num: true, get: r => r.cancellation_rate_pct, fmt: fmt.pct, bar: true },
+      { key: "d", title: "Diverted", num: true, get: r => r.diverted_flights, fmt: fmt.int }], { sortKey: "m", dir: 1 }),
+  });
+  const hourCard = card({
+    title: "Delay rate by scheduled departure hour", sub: "Delays accumulate through the day as late aircraft propagate",
+    draw: h => columnChart(h, hourly, { value: r => r.arrival_delay_rate_pct, fmt: fmt.pct, tick: t => t + "%",
+      label: r => hourLabel(r.scheduled_departure_hour), short: r => String(r.scheduled_departure_hour).padStart(2, "0"),
+      tooltip: rateTooltip, aria: "Column chart of delay rate by hour" }),
+    table: h => dataTable(h, hourly, [
+      { key: "h", title: "Hour", get: r => r.scheduled_departure_hour, fmt: hourLabel, num: true },
+      { key: "f", title: "Flights", num: true, get: r => r.flights, fmt: fmt.int },
+      { key: "r", title: "Delay rate", num: true, get: r => r.arrival_delay_rate_pct, fmt: fmt.pct, bar: true },
+      { key: "a", title: "Avg delay", num: true, get: r => r.average_arrival_delay_min, fmt: fmt.min }], { sortKey: "h", dir: 1 }),
+  });
+  const dayCard = card({
+    title: "Delay rate by day of week", sub: "Monday to Sunday",
+    draw: h => columnChart(h, weekday, { value: r => r.arrival_delay_rate_pct, fmt: fmt.pct, tick: t => t + "%",
+      label: r => r.day_name || r.day_of_week, tooltip: rateTooltip, aria: "Column chart of delay rate by weekday", empty: "Weekday summary not available." }),
+    table: h => dataTable(h, weekday, [
+      { key: "d", title: "Day", get: r => r.day_name, },
+      { key: "f", title: "Flights", num: true, get: r => r.flights, fmt: fmt.int },
+      { key: "r", title: "Delay rate", num: true, get: r => r.arrival_delay_rate_pct, fmt: fmt.pct, bar: true },
+      { key: "a", title: "Avg delay", num: true, get: r => r.average_arrival_delay_min, fmt: fmt.min }], { sortKey: null }),
+  });
+  const timeSection = el("section", { class: "block", id: "time" }, el("div", { class: "wrap" },
+    el("div", { class: "section-head" }, el("div", {}, el("h2", { text: "Time patterns" }), el("p", { class: "section-sub", text: "When delays happen: seasonality, time of day and day of week." }))),
+    el("div", { class: "grid two" }, monthCard.node, cancelCard.node, hourCard.node, dayCard.node)));
+
+  /* ---------- Airlines ---------- */
+  const AIRLINE_METRICS = {
+    rate: { label: "Delay rate", get: r => r.arrival_delay_rate_pct, fmt: fmt.pct, tick: t => t + "%" },
+    avg: { label: "Avg delay", get: r => r.average_arrival_delay_min, fmt: fmt.min, tick: t => t + "" },
+    cancel: { label: "Cancel rate", get: r => r.cancellation_rate_pct, fmt: fmt.pct, tick: t => t + "%" },
+    flights: { label: "Flights", get: r => r.flights, fmt: fmt.compact, tick: fmt.compact },
+  };
+  let airlineMetric = "rate";
+  const airlineCard = card({
+    title: "Airline performance", sub: `Airlines with at least ${(meta.min_flights || "").match(/\d+/)?.[0] || 100} operated flights`,
+    controls: segmented(Object.entries(AIRLINE_METRICS).map(([k, v]) => [k, v.label]), airlineMetric, v => { airlineMetric = v; airlineCard.redraw(); }, "Airline metric"),
+    draw: h => {
+      const m = AIRLINE_METRICS[airlineMetric];
+      hBarChart(h, airlines.slice().sort((a, b) => (m.get(b) ?? 0) - (m.get(a) ?? 0)), {
+        value: r => m.get(r) || 0, fmt: m.fmt, tick: m.tick, label: r => r.airline_name || r.airline,
+        title: r => `${r.airline_name} (${r.airline})`,
+        tooltip: r => [["Delay rate", fmt.pct(r.arrival_delay_rate_pct)], ["Avg arrival delay", fmt.min(r.average_arrival_delay_min)], ["Cancel rate", fmt.pct(r.cancellation_rate_pct)], ["Flights", fmt.int(r.flights)]],
+        aria: "Bar chart of airline " + m.label, empty: "No airline met the minimum flight threshold.",
+      });
+    },
+    table: h => dataTable(h, airlines, [
+      { key: "n", title: "Airline", get: r => r.airline_name },
+      { key: "c", title: "Code", get: r => r.airline },
+      { key: "f", title: "Flights", num: true, get: r => r.flights, fmt: fmt.int },
+      { key: "r", title: "Delay rate", num: true, get: r => r.arrival_delay_rate_pct, fmt: fmt.pct, bar: true },
+      { key: "a", title: "Avg arr. delay", num: true, get: r => r.average_arrival_delay_min, fmt: fmt.min },
+      { key: "dd", title: "Avg dep. delay", num: true, get: r => r.average_departure_delay_min, fmt: fmt.min },
+      { key: "x", title: "Cancel rate", num: true, get: r => r.cancellation_rate_pct, fmt: fmt.pct }], { sortKey: "r", empty: "No airline met the minimum flight threshold." }),
+  });
+  const airlineSection = el("section", { class: "block", id: "airlines" }, el("div", { class: "wrap" },
+    el("div", { class: "section-head" }, el("div", {}, el("h2", { text: "Airlines" }), el("p", { class: "section-sub", text: "Delay rate (how often) and average delay (how long) are different measures — switch between them." }))),
+    airlineCard.node));
+
+  /* ---------- Airports ---------- */
+  let airportSide = "origin", airportRank = "priority_score", airportTopN = 15;
+  const SIDES = {
+    origin: { rows: origins, code: "origin", city: "origin_city", rate: "departure_delay_rate_pct", avg: "average_departure_delay_min", noun: "departures" },
+    destination: { rows: destinations, code: "destination", city: "destination_city", rate: "arrival_delay_rate_pct", avg: "average_arrival_delay_min", noun: "arrivals" },
+  };
+  const RANKS = { priority_score: "Priority score", rate: "Delay rate", flights: "Flights" };
+  function airportRows() {
+    const sd = SIDES[airportSide];
+    const key = airportRank === "rate" ? sd.rate : airportRank;
+    return sd.rows.slice().sort(byDesc(key));
+  }
+  const topNSelect = el("select", { "aria-label": "Number of airports" }, [10, 15, 25].map(n => el("option", { value: n, selected: n === airportTopN, text: "Top " + n })));
+  topNSelect.addEventListener("change", () => { airportTopN = +topNSelect.value; airportCard.redraw(); });
+  const airportCard = card({
+    title: "Airport hotspots", sub: "Origin = departure delays · Destination = arrival delays",
+    controls: [
+      segmented([["origin", "Origin"], ["destination", "Destination"]], airportSide, v => { airportSide = v; airportCard.redraw(); }, "Airport side"),
+      segmented(Object.entries(RANKS), airportRank, v => { airportRank = v; airportCard.redraw(); }, "Rank airports by"),
+      topNSelect],
+    draw: h => {
+      const sd = SIDES[airportSide];
+      const key = airportRank === "rate" ? sd.rate : airportRank;
+      const f = airportRank === "flights" ? fmt.compact : airportRank === "rate" ? fmt.pct : fmt.num1;
+      hBarChart(h, airportRows().slice(0, airportTopN), {
+        value: r => r[key] || 0, fmt: f, tick: airportRank === "rate" ? (t => t + "%") : fmt.compact,
+        label: r => r[sd.code], title: r => airportName(r[sd.code], r[sd.city]),
+        tooltip: r => [["Delay rate", fmt.pct(r[sd.rate])], ["Flights", fmt.int(r.flights)], ["Avg delay", fmt.min(r[sd.avg])], ["Priority score", fmt.num1(r.priority_score)]],
+        aria: "Bar chart of airport hotspots", empty: "No airport met the minimum flight threshold.",
+      });
+    },
+    table: h => {
+      const sd = SIDES[airportSide];
+      dataTable(h, sd.rows, [
+        { key: "c", title: "Airport", get: r => r[sd.code] },
+        { key: "city", title: "City", get: r => r[sd.city] },
+        { key: "f", title: "Flights", num: true, get: r => r.flights, fmt: fmt.int },
+        { key: "r", title: "Delay rate", num: true, get: r => r[sd.rate], fmt: fmt.pct, bar: true },
+        { key: "a", title: "Avg delay", num: true, get: r => r[sd.avg], fmt: fmt.min },
+        { key: "p", title: "Priority", num: true, get: r => r.priority_score, fmt: fmt.num1 }], { sortKey: "p", search: "Search airport or city", empty: "No airport met the minimum flight threshold." });
+    },
+  });
+  const airportSection = el("section", { class: "block", id: "airports" }, el("div", { class: "wrap" },
+    el("div", { class: "section-head" }, el("div", {}, el("h2", { text: "Airport hotspots" }),
+      el("p", { class: "section-sub", text: "Priority score = delay rate × ln(1 + flights): a project-defined way to surface airports that are both busy and often late. It is not an official aviation metric." }))),
+    airportCard.node));
+
+  /* ---------- Routes ---------- */
+  const routeCard = card({
+    title: "Route volume vs delay rate", sub: "Each dot is a route. Upper right = busy and often late.",
+    legend: [el("span", {}, el("i", { style: "background:var(--series-1);opacity:.6" }), "Route"),
+      el("span", {}, el("i", { style: "background:var(--series-2)" }), "Top 10 by priority score"),
+      el("span", {}, el("i", { class: "line" }), "Network average")],
+    draw: h => scatterChart(h, routes, { x: r => r.flights, y: r => r.arrival_delay_rate_pct, highlight: r => priorityTop.has(r.route),
+      ref: overallRate, refLabel: `Network avg ${fmt.pct(overallRate)}`, label: r => r.route, labelCount: 5, height: window.innerWidth < 640 ? 300 : 380,
+      title: r => `${r.route}${r.origin_city ? ` · ${r.origin_city} → ${r.destination_city}` : ""}`,
+      tooltip: r => [["Delay rate", fmt.pct(r.arrival_delay_rate_pct)], ["Flights", fmt.int(r.flights)], ["Avg delay", fmt.min(r.average_arrival_delay_min)], ["Priority score", fmt.num1(r.priority_score)]],
+      aria: "Scatter plot of routes by flight volume and delay rate", empty: "No route met the minimum flight threshold." }),
+    table: h => routeTable(h),
+  });
+  function routeTable(h) {
+    dataTable(h, routes, [
+      { key: "r", title: "Route", get: r => r.route },
+      { key: "o", title: "From", get: r => r.origin_city },
+      { key: "d", title: "To", get: r => r.destination_city },
+      { key: "f", title: "Flights", num: true, get: r => r.flights, fmt: fmt.int },
+      { key: "dl", title: "Delayed", num: true, get: r => r.arrival_delayed_flights, fmt: fmt.int },
+      { key: "rt", title: "Delay rate", num: true, get: r => r.arrival_delay_rate_pct, fmt: fmt.pct, bar: true },
+      { key: "a", title: "Avg delay", num: true, get: r => r.average_arrival_delay_min, fmt: fmt.min },
+      { key: "p", title: "Priority", num: true, get: r => r.priority_score, fmt: fmt.num1 }], { sortKey: "p", search: "Search route, e.g. ORD or Chicago", limit: 300, empty: "No route met the minimum flight threshold." });
+  }
+  const routeTopHost = el("div");
+  const routeTopCard = el("div", { class: "card", style: "margin-top:16px" },
+    el("div", { class: "card-head" }, el("div", {}, el("h3", { text: "Route bottlenecks" }), el("p", { class: "sub", text: "All routes meeting the volume minimum. Sorted by priority score; click a header to re-sort." }))),
+    routeTopHost);
+  const routeSection = el("section", { class: "block", id: "routes" }, el("div", { class: "wrap" },
+    el("div", { class: "section-head" }, el("div", {}, el("h2", { text: "Route bottlenecks" }), el("p", { class: "section-sub", text: "A low-volume route with a high rate is less telling than a busy route with a moderately high one — read both axes together." }))),
+    routeCard.node, routeTopCard));
+
+  /* ---------- Causes ---------- */
+  const causeCard = card({
+    title: "Reported delay minutes by cause", sub: "Share of all minutes attributed by carriers. Cause fields are blank for on-time flights.",
+    draw: h => hBarChart(h, causes, { value: r => r.share_of_reported_minutes_pct || 0, fmt: fmt.pct, tick: t => t + "%", label: r => r.delay_cause,
+      tooltip: r => [["Share", fmt.pct(r.share_of_reported_minutes_pct)], ["Minutes", fmt.int(r.total_reported_delay_minutes)]],
+      aria: "Bar chart of delay causes", empty: "No delay-cause fields in this dataset." }),
+    table: h => dataTable(h, causes, [
+      { key: "c", title: "Cause", get: r => r.delay_cause },
+      { key: "m", title: "Reported minutes", num: true, get: r => r.total_reported_delay_minutes, fmt: fmt.int },
+      { key: "s", title: "Share", num: true, get: r => r.share_of_reported_minutes_pct, fmt: fmt.pct, bar: true }], { sortKey: "m" }),
+  });
+  const causeSection = el("section", { class: "block", id: "causes" }, el("div", { class: "wrap" },
+    el("div", { class: "section-head" }, el("div", {}, el("h2", { text: "Delay causes" }), el("p", { class: "section-sub", text: "Late Aircraft means a previous leg arrived late — the network effect. National Air System covers traffic control, airport operations and non-extreme weather." }))),
+    causeCard.node));
+
+  /* ---------- Method ---------- */
+  const methodSection = el("section", { class: "block method", id: "method" }, el("div", { class: "wrap" },
+    el("div", { class: "section-head" }, el("div", {}, el("h2", { text: "Methodology & caveats" }))),
+    el("div", { class: "card" }, el("dl", {},
+      el("dt", { text: "Data source" }), el("dd", { text: `${meta.source || "–"}${meta.period ? ` · period ${meta.period}` : ""}${meta.downloaded ? ` · downloaded ${meta.downloaded}` : ""}.` }),
+      el("dt", { text: "Delayed flight" }), el("dd", { text: "An operated flight whose arrival delay is 15 minutes or more (the common U.S. on-time threshold)." }),
+      el("dt", { text: "Arrival delay rate" }), el("dd", { text: "Delayed operated flights ÷ operated flights with a known arrival delay × 100. Cancelled and diverted flights are excluded from both and reported separately." }),
+      el("dt", { text: "Departure delay rate" }), el("dd", { text: "Used for origin airports: non-cancelled flights departing 15+ minutes late ÷ non-cancelled flights with a known departure delay." }),
+      el("dt", { text: "Minimum volume" }), el("dd", { text: `Rankings include only groups with enough flights (${meta.min_flights || "airline/airport 100, route 50"}) to avoid unstable rates from tiny samples.` }),
+      el("dt", { text: "Priority score" }), el("dd", { text: "Delay rate (%) × ln(1 + flights). A project-defined score balancing rate and volume; compare it with delay rate alone." }),
+      el("dt", { text: "Pipeline" }), el("dd", {}, "PySpark (local mode) reads the raw CSV, normalises column names, casts types, drops invalid and duplicate records, derives features, writes Parquet partitioned by month, and aggregates the summary CSVs in ", el("code", { text: "output/powerbi/" }), " (also used for Power BI)."),
+      el("dt", { text: "Limitations" }), el("dd", { text: "U.S. reporting carriers only; historical and descriptive — no prediction. Delay causes can be blank. High delay metrics flag a hotspot for investigation; they do not prove the airport or airline caused the delay." }))),
+    ));
+
+  const footer = el("footer", {}, el("div", { class: "wrap", text: `Generated ${meta.generated_at || ""} from output/powerbi summary CSVs.` }));
+
+  app.append(header, nav, el("main", {}, overview, timeSection, airlineSection, airportSection, routeSection, causeSection, methodSection), footer);
+  routeTable(routeTopHost);
+
+  /* ---------- Render + resize ---------- */
+  function drawAll() { renderers.forEach(r => r.redraw()); }
+  drawAll();
+  let lastWidth = window.innerWidth, raf = 0;
+  window.addEventListener("resize", () => {
+    if (window.innerWidth === lastWidth) return;
+    lastWidth = window.innerWidth;
+    cancelAnimationFrame(raf); raf = requestAnimationFrame(drawAll);
+  });
+
+  /* ---------- Active section in nav ---------- */
+  const sectionEls = NAV.map(([id]) => document.getElementById(id));
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      navLinks.forEach(a => a.classList.toggle("active", a.getAttribute("href") === "#" + e.target.id));
+    });
+  }, { rootMargin: "-40% 0px -55% 0px" });
+  sectionEls.forEach(sec => sec && observer.observe(sec));
+})();
+</script>
+</body>
+</html>

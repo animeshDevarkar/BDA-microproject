@@ -1,0 +1,14 @@
+metric,value
+cleaned_records,7049800.00
+operated_flights_with_arrival_data,6895979.00
+arrival_delayed_flights_15_min_or_more,1568212.00
+arrival_delay_rate_pct,22.74
+cancelled_flights,133147.00
+diverted_flights,20673.00
+cancellation_rate_pct,1.89
+average_arrival_delay_min,8.50
+airlines,14.00
+origin_airports,360.00
+routes,7151.00
+first_flight_date_yyyymmdd,20250901.00
+last_flight_date_yyyymmdd,20260831.00

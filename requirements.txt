@@ -1,0 +1,5 @@
+# PySpark 3.5.9+ is required on Windows with Python 3.12 (3.5.3 crashes Python workers).
+pyspark==3.5.9
+pandas>=2.0
+pyarrow>=14
+pytest>=8

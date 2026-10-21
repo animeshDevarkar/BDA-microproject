@@ -1,0 +1,15 @@
+airline,flights,arrival_delayed_flights,average_arrival_delay_min,average_departure_delay_min,arrival_delay_rate_pct,scheduled_flights,cancelled_flights,cancellation_rate_pct,airline_name
+B6,231217,66432,14.03,18.92,28.73,240615,8577,3.56,JetBlue Airways
+NK,95300,26726,12.97,18.46,28.04,99981,4521,4.52,Spirit Airlines
+F9,208222,56817,13.98,18.97,27.29,213022,4361,2.05,Frontier Airlines
+OH,230585,61138,16.05,21.74,26.51,242979,11660,4.80,PSA Airlines
+G4,124731,32594,15.42,17.05,26.13,126004,862,0.68,Allegiant Air
+AA,964225,243665,13.02,19.99,25.27,988892,21118,2.14,American Airlines
+WN,1375352,334203,7.41,14.34,24.30,1391794,12741,0.92,Southwest Airlines
+YX,346966,76108,6.09,10.99,21.94,364390,16517,4.53,Republic Airways
+OO,837358,178399,9.90,14.19,21.30,855400,15307,1.79,SkyWest Airlines
+UA,819606,173415,6.88,12.03,21.16,830825,8497,1.02,United Airlines
+AS,305255,61962,3.01,8.63,20.30,309844,3717,1.20,Alaska Airlines
+HA,25915,4967,8.33,9.93,19.17,26175,227,0.87,Hawaiian Airlines
+MQ,312533,59497,4.02,9.64,19.04,320362,7002,2.19,Envoy Air
+DL,1018714,192289,4.34,10.27,18.88,1039517,18040,1.74,Delta Air Lines

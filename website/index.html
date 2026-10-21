@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>OnTime Check</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Check how often your U.S. flight arrives late, compare airlines on your route and find the best time to fly. Based on a year of official BTS on-time records.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23f2b33d'/%3E%3Cpath transform='translate(4 4)' d='M21%2016v-2l-8-5V3.5C13%202.67%2012.33%202%2011.5%202S10%202.67%2010%203.5V9l-8%205v2l8-2.5V19l-2%201.5V22l3.5-1%203.5%201v-1.5L13%2019v-5.5l8%202.5z' fill='%2314213d'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=JetBrains+Mono:wght@500;600&family=Public+Sans:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#check" aria-label="OnTime Check home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M21 16v-2l-8-5V3.5C13 2.67 12.33 2 11.5 2S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>
+      </span>
+      <div><b>OnTime Check</b><span>U.S. flight delay odds</span></div>
+    </a>
+    <nav class="tabs" aria-label="Sections">
+      <a href="#check" data-view="check">Check a flight</a>
+      <a href="#airports" data-view="airports">Airports</a>
+      <a href="#airlines" data-view="airlines">Airlines</a>
+      <a href="#trips" data-view="trips">My trips <span class="badge-count" id="trip-count" hidden>0</span></a>
+      <a href="#about" data-view="about">How it works</a>
+    </nav>
+    <button class="icon-btn" id="theme-toggle" type="button" aria-label="Switch light or dark theme" title="Switch theme">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </div>
+</header>
+
+<section class="hero" id="hero">
+  <div class="wrap">
+    <h1>How often does your flight arrive late?</h1>
+    <p class="lede">Pick your airports and we look up every flight on that route from the last year of
+      official U.S. on-time records. You get the odds of a 15-minute-plus delay, the most reliable airline and the best time of day to fly.</p>
+    <form class="searchbar" id="search" autocomplete="off" novalidate>
+      <div class="field from">
+        <label for="from">From</label>
+        <div class="combo"><input id="from" name="from" placeholder="City or code, e.g. JFK" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="from-list" spellcheck="false"><ul class="combo-list" id="from-list" role="listbox" hidden></ul></div>
+      </div>
+      <button class="swap" type="button" id="swap" aria-label="Swap origin and destination" title="Swap">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 4l-4 4 4 4M3 8h14M17 20l4-4-4-4M21 16H7"/></svg>
+      </button>
+      <div class="field to">
+        <label for="to">To</label>
+        <div class="combo"><input id="to" name="to" placeholder="City or code, e.g. LAX" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="to-list" spellcheck="false"><ul class="combo-list" id="to-list" role="listbox" hidden></ul></div>
+      </div>
+      <div class="field airline opt">
+        <label for="airline">Airline</label>
+        <select id="airline" name="airline"><option value="">Any airline</option></select>
+      </div>
+      <div class="field hour opt">
+        <label for="hour">Departs around</label>
+        <select id="hour" name="hour"><option value="">Any time</option></select>
+      </div>
+      <div class="field month opt">
+        <label for="month">Travel month</label>
+        <select id="month" name="month"><option value="">Any month</option></select>
+      </div>
+      <div class="go"><button class="btn primary" type="submit">Check odds</button></div>
+    </form>
+    <div class="example-row"><span style="opacity:.75">Busy routes:</span><span id="examples"></span></div>
+  </div>
+</section>
+
+<main class="wrap" id="app">
+  <noscript><div class="panel">This site needs JavaScript turned on.</div></noscript>
+  <section id="view-check" data-section="check"></section>
+  <section id="view-airports" data-section="airports" hidden></section>
+  <section id="view-airlines" data-section="airlines" hidden></section>
+  <section id="view-trips" data-section="trips" hidden></section>
+  <section id="view-about" data-section="about" hidden></section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span id="footer-source">Data: U.S. DOT Bureau of Transportation Statistics, On-Time Reporting Carrier Performance.</span>
+    <span>Historical odds, not a live flight status. Always check with your airline.</span>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="data/site-data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
