@@ -1,6 +1,6 @@
 .venv/
 __pycache__/
-data/raw/*.csv
+data/raw/**/*.csv
 data/raw/bts_zips/
 data/processed/
 logs/

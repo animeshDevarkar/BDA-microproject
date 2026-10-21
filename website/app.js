@@ -1,15 +1,25 @@
 /* OnTime Check - customer site for the Flight Delay Analysis project.
-   Reads window.SITE_DATA (written by src/build_website_data.py) and renders everything
+   Reads window.SITE_DATASETS (written by src/build_website_data.py) - one entry per data
+   option: International (USA, BTS) and Domestic (India, simulated) - and renders everything
    client-side, so the site runs from disk or on any static host with no server code. */
 (function () {
   'use strict';
 
-  const D = window.SITE_DATA;
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
 
+  // ---------------------------------------------------------------- dataset choice
+  const SETS = window.SITE_DATASETS || {};
+  const DATASET_ORDER = ['usa', 'india'].filter(k => SETS[k]);
+  const DATASET = (() => {
+    try { const q = new URLSearchParams(location.search).get('region'); if (q && SETS[q]) return q; } catch (e) { /* no query */ }
+    try { const v = JSON.parse(localStorage.getItem('ontime.dataset')); if (v && SETS[v]) return v; } catch (e) { /* storage blocked */ }
+    return DATASET_ORDER[0];
+  })();
+  const D = SETS[DATASET];
+
   if (!D) {
-    $('#view-check').innerHTML = '<div class="panel notice">Flight data is missing. Run <span class="code">python src/flight_delay_pipeline.py</span> (or <span class="code">python src/build_website_data.py</span>) to create website/data/site-data.js.</div>';
+    $('#view-check').innerHTML = '<div class="panel notice">Flight data is missing. Run <span class="code">python src/flight_delay_pipeline.py</span> (and <span class="code">--dataset india</span>) to create website/data/site-data-usa.js and site-data-india.js.</div>';
     return;
   }
 
@@ -22,6 +32,10 @@
   };
   const keyOf = (o, d) => o + '-' + d;
 
+  const DS = D.dataset || { key: 'usa', option: 'International', country: 'USA', region_name: 'U.S.', simulated: false };
+  const REGION = DS.region_name;                                    // "U.S. average" / "India average"
+  const VS_REGION = REGION === 'U.S.' ? 'the U.S.' : REGION;
+  const ADJ = DS.key === 'india' ? 'Indian' : 'U.S.';
   const NAMES = D.airline_names || {};
   const airlineName = code => NAMES[code] || code;
   const OVERALL = D.overall;
@@ -55,8 +69,9 @@
   const fmtDate = iso => { if (!iso) return ''; const [y, m, d] = iso.split('-'); return `${MONTH_NAMES[+m - 1].slice(0, 3)} ${+d}, ${y}`; };
 
   const store = {
-    get(key, fallback) { try { const v = localStorage.getItem('ontime.' + key); return v == null ? fallback : JSON.parse(v); } catch (e) { return fallback; } },
-    set(key, value) { try { localStorage.setItem('ontime.' + key, JSON.stringify(value)); } catch (e) { /* storage blocked: keep working without it */ } },
+    // Searches and trips are kept per dataset, since airport codes differ between them.
+    get(key, fallback, shared) { try { const v = localStorage.getItem('ontime.' + key + (shared ? '' : '.' + DATASET)); return v == null ? fallback : JSON.parse(v); } catch (e) { return fallback; } },
+    set(key, value, shared) { try { localStorage.setItem('ontime.' + key + (shared ? '' : '.' + DATASET), JSON.stringify(value)); } catch (e) { /* storage blocked: keep working without it */ } },
   };
 
   let toastTimer;
@@ -369,8 +384,8 @@
           <div style="display:grid;gap:10px">
             <span class="label">Chance of arriving 15+ minutes late</span>
             <div class="big-figure"><span class="value num">${Math.round(est.p)}<small>%</small></span>${statusPill(est.p)}</div>
-            <div class="meter" role="img" aria-label="${Math.round(est.p)} percent, U.S. average ${fmtPct(nat)}"><i style="width:${est.p}%"></i><b style="left:${nat}%" title="U.S. average"></b></div>
-            <p class="small muted">About ${Math.round(est.p / 10) || '<1'} in 10 flights like this arrive late. The amber mark is the U.S. average (${fmtPct(nat)}).</p>
+            <div class="meter" role="img" aria-label="${Math.round(est.p)} percent, ${REGION} average ${fmtPct(nat)}"><i style="width:${est.p}%"></i><b style="left:${nat}%" title="${REGION} average"></b></div>
+            <p class="small muted">About ${Math.round(est.p / 10) || '<1'} in 10 flights like this arrive late. The amber mark is the ${REGION} average (${fmtPct(nat)}).</p>
           </div>
           ${est.note ? `<p class="small notice">${esc(est.note)}</p>` : ''}
           <details class="explain">
@@ -388,7 +403,7 @@
             <div><span>Arrives on time</span><strong>${Math.round(onTime)}%</strong></div>
             <div><span>Cancelled</span><strong>${fmtPct(b.cancel_pct)}</strong></div>
             <div><span>When late, typical delay</span><strong>${b.late_avg_min != null ? b.late_avg_min + ' min' : '–'}</strong></div>
-            <div><span>U.S. average late</span><strong>${fmtPct(nat)}</strong></div>
+            <div><span>${REGION} average late</span><strong>${fmtPct(nat)}</strong></div>
           </div>
           <div class="actions">
             <button class="btn primary small" type="button" id="save-trip" aria-pressed="${saved}">${saved ? 'Saved to My trips' : 'Save trip'}</button>
@@ -410,7 +425,7 @@
       </div>
       <div class="grid-2">
         <section class="panel">
-          <div class="panel-head"><h3>Month by month at ${esc(s.from)}</h3><p>Late arrivals for flights leaving ${esc(s.from)} vs the U.S.</p></div>
+          <div class="panel-head"><h3>Month by month at ${esc(s.from)}</h3><p>Late arrivals for flights leaving ${esc(s.from)} vs ${VS_REGION}</p></div>
           <div id="month-chart"></div>
         </section>
         <section class="panel">
@@ -445,7 +460,7 @@
     const ams = new Map((monthsAt.get(s.from) || []).map(r => [r.month, r]));
     lineChart($('#month-chart'), MONTHS.map(m => monthLabel(m, true)), [
       { name: s.from, color: 'var(--series-1)', values: MONTHS.map(m => ams.has(m) ? ams.get(m).late_pct : null) },
-      { name: 'U.S. average', color: 'var(--series-2)', values: nationalMonths.map(r => r.late_pct), dashed: true, dots: false },
+      { name: `${REGION} average`, color: 'var(--series-2)', values: nationalMonths.map(r => r.late_pct), dashed: true, dots: false },
     ], { label: `Late arrival rate by month at ${s.from}`, tipTitle: i => monthYear(MONTHS[i]) });
 
     // Weekdays
@@ -467,7 +482,7 @@
 
   function shareUrl(s) {
     const base = location.href.split(/[?#]/)[0];
-    const q = new URLSearchParams();
+    const q = new URLSearchParams({ region: DATASET });
     ['from', 'to', 'airline', 'hour', 'month'].forEach(k => { if (s[k] !== '' && s[k] != null) q.set(k, s[k]); });
     return `${base}?${q}#check`;
   }
@@ -491,7 +506,7 @@
     const host = $('#view-airports');
     host.innerHTML = `${airportView ? '<div id="airport-detail" style="display:grid;gap:20px"></div>' : ''}
       <section class="panel">
-        <div class="panel-head"><h2>Airports</h2><p>${fmtInt(airports.length)} U.S. airports with at least ${OVERALL.min_flights.airport} departures. Pick one for details.</p></div>
+        <div class="panel-head"><h2>Airports</h2><p>${fmtInt(airports.length)} ${ADJ} airports with at least ${OVERALL.min_flights.airport} departures. Pick one for details.</p></div>
         <div class="toolbar">
           <input type="search" id="airport-q" placeholder="Search code or city" aria-label="Search airports" value="${esc(airportQuery)}" style="flex:1 1 220px">
           <label class="small muted" for="airport-sort">Sort by</label>
@@ -542,8 +557,8 @@
         <div class="tiles">
           <div class="tile"><span class="label">Departures</span><strong>${fmtInt(a.flights)}</strong><span class="small muted">in the year of data</span></div>
           <div class="tile"><span class="label">Arrive 15+ min late</span><strong>${fmtPct(a.late_pct)}</strong>${statusPill(a.late_pct)}</div>
-          <div class="tile"><span class="label">Cancelled</span><strong>${fmtPct(a.cancel_pct)}</strong><span class="small muted">U.S. ${fmtPct(OVERALL.cancel_pct)}</span></div>
-          <div class="tile"><span class="label">Typical delay when late</span><strong>${a.late_avg_min} min</strong><span class="small muted">U.S. ${OVERALL.late_avg_min} min</span></div>
+          <div class="tile"><span class="label">Cancelled</span><strong>${fmtPct(a.cancel_pct)}</strong><span class="small muted">${REGION} ${fmtPct(OVERALL.cancel_pct)}</span></div>
+          <div class="tile"><span class="label">Typical delay when late</span><strong>${a.late_avg_min} min</strong><span class="small muted">${REGION} ${OVERALL.late_avg_min} min</span></div>
         </div>
       </section>
       <div class="grid-2">
@@ -564,7 +579,7 @@
     const ams = new Map((monthsAt.get(code) || []).map(r => [r.month, r]));
     lineChart($('#ad-months'), MONTHS.map(m => monthLabel(m, true)), [
       { name: code, color: 'var(--series-1)', values: MONTHS.map(m => ams.has(m) ? ams.get(m).late_pct : null) },
-      { name: 'U.S. average', color: 'var(--series-2)', values: nationalMonths.map(r => r.late_pct), dashed: true, dots: false },
+      { name: `${REGION} average`, color: 'var(--series-2)', values: nationalMonths.map(r => r.late_pct), dashed: true, dots: false },
     ], { tipTitle: i => monthYear(MONTHS[i]) });
     $('#close-airport').addEventListener('click', () => { airportView = null; renderAirports(); });
     const pick = tr => { if (tr) runSearch({ from: code, to: tr.dataset.to, airline: '', hour: '', month: '' }); };
@@ -585,11 +600,11 @@
     const sorted = airlines.slice().sort((a, b) => a[airlineMetric] - b[airlineMetric]);
     host.innerHTML = `
       <section class="panel">
-        <div class="panel-head"><h2>Airlines</h2><p>All U.S. reporting carriers, best at the top. Pick one to see its routes.</p><span class="spacer"></span>
+        <div class="panel-head"><h2>Airlines</h2><p>All ${DS.key === 'india' ? 'Indian domestic airlines' : 'U.S. reporting carriers'}, best at the top. Pick one to see its routes.</p><span class="spacer"></span>
           <div class="seg" role="group" aria-label="Compare by">${Object.entries(metrics).map(([k, v]) => `<button type="button" data-m="${k}" aria-pressed="${k === airlineMetric}">${v.label}</button>`).join('')}</div>
         </div>
         ${barList(sorted.map(a => ({ key: a.airline, name: airlineName(a.airline), sub: `${fmtInt(a.flights)} flights`, value: a[airlineMetric], active: a.airline === airlineFocus })), { fmt: mt.fmt, clickable: true })}
-        <p class="small muted" style="margin-top:10px">U.S. average: ${airlineMetric === 'late_pct' ? fmtPct(OVERALL.late_pct) : airlineMetric === 'cancel_pct' ? fmtPct(OVERALL.cancel_pct) : OVERALL.late_avg_min + ' min'}.</p>
+        <p class="small muted" style="margin-top:10px">${REGION} average: ${airlineMetric === 'late_pct' ? fmtPct(OVERALL.late_pct) : airlineMetric === 'cancel_pct' ? fmtPct(OVERALL.cancel_pct) : OVERALL.late_avg_min + ' min'}.</p>
       </section>
       <div id="airline-detail"></div>`;
     $$('.seg button', host).forEach(b => b.addEventListener('click', () => { airlineMetric = b.dataset.m; renderAirlines(); }));
@@ -656,12 +671,15 @@
     const bestHour = nationalHours.filter(h => h.flights > 10000).sort((a, b) => a.late_pct - b.late_pct)[0];
     $('#view-about').innerHTML = `<section class="panel"><div class="prose">
       <h2>How OnTime Check works</h2>
-      <p>Every number comes from the U.S. Department of Transportation's Bureau of Transportation Statistics (BTS)
-        on-time records: <b>${fmtInt(OVERALL.flights)}</b> domestic flights from ${fmtDate(OVERALL.first_date)} to ${fmtDate(OVERALL.last_date)}.
-        Airlines must report every scheduled flight, so this is a full count, not a sample.</p>
+      <p>The site has two data options. Use the switch at the top to change between them.</p>
+      <ul>
+        <li><b>International · USA</b>: real U.S. Department of Transportation (BTS) on-time records. Airlines must report every scheduled flight, so it is a full count, not a sample.</li>
+        <li><b>Domestic · India</b>: <b>simulated</b> flights. India's regulator DGCA publishes only monthly on-time percentages per airline, not flight-by-flight records, so this data is generated with real airports, airlines and routes and with delay rates calibrated to DGCA on-time performance. It shows realistic patterns (winter fog in the north, monsoon on the west coast, evening congestion), but the numbers are not real observations.</li>
+      </ul>
+      <p>You are viewing <b>${esc(DS.option)} · ${esc(DS.country)}</b>: <b>${fmtInt(OVERALL.flights)}</b> flights from ${fmtDate(OVERALL.first_date)} to ${fmtDate(OVERALL.last_date)}.</p>
       <h3>What “late” means</h3>
       <ul>
-        <li>A flight is <b>late</b> when it reaches the gate 15 minutes or more after schedule. This is the official BTS definition.</li>
+        <li>A flight is <b>late</b> when it reaches the gate 15 minutes or more after schedule. This is the standard definition used by BTS in the U.S. and DGCA in India.</li>
         <li>The late percentage counts flights that operated. Cancelled and diverted flights are shown separately.</li>
         <li><b>Typical delay when late</b> is the average arrival delay of the late flights only.</li>
       </ul>
@@ -673,7 +691,7 @@
       </ul>
       <h3>Good to know</h3>
       <ul>
-        <li>Across the U.S., ${fmtPct(OVERALL.late_pct)} of flights arrived late and ${fmtPct(OVERALL.cancel_pct)} were cancelled.</li>
+        <li>Across ${VS_REGION}, ${fmtPct(OVERALL.late_pct)} of flights arrived late and ${fmtPct(OVERALL.cancel_pct)} were cancelled.</li>
         ${bestHour && worstHour ? `<li>Flights scheduled around ${fmtHour(bestHour.hour)} were late ${fmtPct(bestHour.late_pct)} of the time, against ${fmtPct(worstHour.late_pct)} around ${fmtHour(worstHour.hour)}.</li>` : ''}
         <li>These are historical odds. They cannot see today's weather or a specific aircraft. Check your airline for live status.</li>
         <li>Saved trips and notes are kept only in your browser. Nothing you type is sent anywhere.</li>
@@ -702,15 +720,38 @@
 
   // ---------------------------------------------------------------- theme
   function applyTheme(t) { if (t) document.documentElement.setAttribute('data-theme', t); }
-  applyTheme(store.get('theme', null));
+  applyTheme(store.get('theme', null, true));
   $('#theme-toggle').addEventListener('click', () => {
     const current = document.documentElement.getAttribute('data-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     const next = current === 'dark' ? 'light' : 'dark';
-    applyTheme(next); store.set('theme', next);
+    applyTheme(next); store.set('theme', next, true);
     show(location.hash.slice(1) || 'check');
   });
 
-  $('#footer-source').textContent = `Data: U.S. DOT Bureau of Transportation Statistics, ${fmtDate(OVERALL.first_date)} – ${fmtDate(OVERALL.last_date)} (${fmtInt(OVERALL.flights)} flights).`;
+  $('#footer-source').textContent = DS.simulated
+    ? `Data: simulated Indian domestic flights calibrated to DGCA on-time performance, ${fmtDate(OVERALL.first_date)} – ${fmtDate(OVERALL.last_date)} (${fmtInt(OVERALL.flights)} flights). Not real flight records.`
+    : `Data: U.S. DOT Bureau of Transportation Statistics, ${fmtDate(OVERALL.first_date)} – ${fmtDate(OVERALL.last_date)} (${fmtInt(OVERALL.flights)} flights).`;
+  $('#hero-lede').textContent = DS.simulated
+    ? 'Pick two Indian airports and we look up every flight on that route in a year of simulated domestic records calibrated to DGCA on-time data. You get the odds of a 15-minute-plus delay, the most reliable airline and the best time of day to fly.'
+    : 'Pick your airports and we look up every flight on that route from the last year of official U.S. on-time records. You get the odds of a 15-minute-plus delay, the most reliable airline and the best time of day to fly.';
+  $('#sim-banner').hidden = !DS.simulated;
+  document.title = DATASET === 'usa' ? 'OnTime Check' : `OnTime Check · ${DS.country}`;
+
+  // Data option switch. Reload so every index is rebuilt for the chosen dataset.
+  const sw = $('#dataset-switch');
+  if (DATASET_ORDER.length > 1) {
+    sw.innerHTML = DATASET_ORDER.map(k => {
+      const d = SETS[k].dataset || {};
+      return `<button type="button" data-ds="${k}" aria-pressed="${k === DATASET}"><b>${esc(d.option || k)}</b> ${esc(d.country || '')}</button>`;
+    }).join('');
+    sw.addEventListener('click', e => {
+      const b = e.target.closest('button[data-ds]');
+      if (!b || b.dataset.ds === DATASET) return;
+      store.set('dataset', b.dataset.ds, true);
+      const view = VIEWS[location.hash.slice(1)] ? location.hash.slice(1) : 'check';
+      location.href = `${location.href.split(/[?#]/)[0]}?region=${b.dataset.ds}#${view}`;
+    });
+  } else sw.hidden = true;
   updateTripCount();
   syncForm();
   show(location.hash.slice(1) || 'check');

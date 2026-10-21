@@ -1,0 +1,685 @@
+origin,destination,route,origin_city,destination_city,flights,arrival_delayed_flights,average_arrival_delay_min,arrival_delay_rate_pct,priority_score
+DEL,IXZ,DEL-IXZ,"Delhi, Delhi","Port Blair, Andaman and Nicobar",1268,343,10.75,27.05,193.30
+BOM,IXR,BOM-IXR,"Mumbai, Maharashtra","Ranchi, Jharkhand",1291,324,11.44,25.10,179.79
+BOM,ATQ,BOM-ATQ,"Mumbai, Maharashtra","Amritsar, Punjab",1327,329,11.03,24.79,178.30
+COK,IXR,COK-IXR,"Kochi, Kerala","Ranchi, Jharkhand",347,86,11.22,24.78,145.04
+BOM,SXR,BOM-SXR,"Mumbai, Maharashtra","Srinagar, Jammu and Kashmir",2207,542,10.49,24.56,189.09
+BOM,DEL,BOM-DEL,"Mumbai, Maharashtra","Delhi, Delhi",20182,4944,10.34,24.50,242.83
+DEL,BOM,DEL-BOM,"Delhi, Delhi","Mumbai, Maharashtra",20300,4963,10.34,24.45,242.49
+COK,ATQ,COK-ATQ,"Kochi, Kerala","Amritsar, Punjab",381,91,9.96,23.88,142.00
+DEL,TRV,DEL-TRV,"Delhi, Delhi","Thiruvananthapuram, Kerala",2153,514,10.13,23.87,183.23
+DEL,PNQ,DEL-PNQ,"Delhi, Delhi","Pune, Maharashtra",5262,1239,9.37,23.55,201.75
+IXR,COK,IXR-COK,"Ranchi, Jharkhand","Kochi, Kerala",361,85,10.39,23.55,138.72
+DED,BOM,DED-BOM,"Dehradun, Uttarakhand","Mumbai, Maharashtra",1039,243,10.40,23.39,162.47
+DEL,COK,DEL-COK,"Delhi, Delhi","Kochi, Kerala",5694,1315,9.34,23.09,199.71
+BOM,IXC,BOM-IXC,"Mumbai, Maharashtra","Chandigarh, Chandigarh",2114,486,9.20,22.99,176.03
+VNS,PNQ,VNS-PNQ,"Varanasi, Uttar Pradesh","Pune, Maharashtra",462,106,8.68,22.94,140.82
+CJB,DEL,CJB-DEL,"Coimbatore, Tamil Nadu","Delhi, Delhi",1629,372,8.45,22.84,168.90
+PNQ,IXR,PNQ-IXR,"Pune, Maharashtra","Ranchi, Jharkhand",316,72,8.94,22.78,131.22
+BOM,IXJ,BOM-IXJ,"Mumbai, Maharashtra","Jammu, Jammu and Kashmir",1038,236,9.75,22.74,157.92
+BLR,VNS,BLR-VNS,"Bengaluru, Karnataka","Varanasi, Uttar Pradesh",1625,367,8.65,22.58,166.99
+JAI,BOM,JAI-BOM,"Jaipur, Rajasthan","Mumbai, Maharashtra",2859,644,9.25,22.53,179.27
+DEL,CCJ,DEL-CCJ,"Delhi, Delhi","Kozhikode, Kerala",1646,370,9.02,22.48,166.49
+IXC,COK,IXC-COK,"Chandigarh, Chandigarh","Kochi, Kerala",619,139,9.83,22.46,144.38
+BLR,DED,BLR-DED,"Bengaluru, Karnataka","Dehradun, Uttarakhand",909,204,8.08,22.44,152.91
+IXE,DEL,IXE-DEL,"Mangaluru, Karnataka","Delhi, Delhi",1258,281,9.03,22.34,159.44
+BLR,IXL,BLR-IXL,"Bengaluru, Karnataka","Leh, Ladakh",489,109,8.52,22.29,138.08
+TRZ,BOM,TRZ-BOM,"Tiruchirappalli, Tamil Nadu","Mumbai, Maharashtra",714,159,7.61,22.27,146.36
+IXJ,BOM,IXJ-BOM,"Jammu, Jammu and Kashmir","Mumbai, Maharashtra",1042,232,9.23,22.26,154.74
+DEL,HBX,DEL-HBX,"Delhi, Delhi","Hubballi, Karnataka",685,152,9.55,22.19,144.92
+CJB,PNQ,CJB-PNQ,"Coimbatore, Tamil Nadu","Pune, Maharashtra",311,69,8.03,22.19,127.42
+BOM,IXL,BOM-IXL,"Mumbai, Maharashtra","Leh, Ladakh",559,124,9.68,22.18,140.37
+GOX,DEL,GOX-DEL,"Goa (Mopa), Goa","Delhi, Delhi",2797,619,8.82,22.13,175.65
+BLR,DEL,BLR-DEL,"Bengaluru, Karnataka","Delhi, Delhi",18237,4035,8.49,22.13,217.08
+BLR,ATQ,BLR-ATQ,"Bengaluru, Karnataka","Amritsar, Punjab",1176,260,8.55,22.11,156.33
+BOM,CJB,BOM-CJB,"Mumbai, Maharashtra","Coimbatore, Tamil Nadu",1348,298,9.39,22.11,159.33
+DEL,DED,DEL-DED,"Delhi, Delhi","Dehradun, Uttarakhand",1816,401,8.08,22.08,165.72
+BOM,LKO,BOM-LKO,"Mumbai, Maharashtra","Lucknow, Uttar Pradesh",2915,642,9.04,22.02,175.71
+BOM,HBX,BOM-HBX,"Mumbai, Maharashtra","Hubballi, Karnataka",569,125,7.76,21.97,139.40
+DEL,MAA,DEL-MAA,"Delhi, Delhi","Chennai, Tamil Nadu",10121,2221,8.69,21.94,202.38
+PNQ,CCJ,PNQ-CCJ,"Pune, Maharashtra","Kozhikode, Kerala",360,79,8.07,21.94,129.23
+MAA,PAT,MAA-PAT,"Chennai, Tamil Nadu","Patna, Bihar",1183,259,9.17,21.89,154.93
+COK,DEL,COK-DEL,"Kochi, Kerala","Delhi, Delhi",5651,1237,9.16,21.89,189.12
+BLR,SXR,BLR-SXR,"Bengaluru, Karnataka","Srinagar, Jammu and Kashmir",1876,410,7.37,21.86,164.73
+PAT,COK,PAT-COK,"Patna, Bihar","Kochi, Kerala",637,139,7.79,21.82,140.93
+IXR,BOM,IXR-BOM,"Ranchi, Jharkhand","Mumbai, Maharashtra",1330,290,9.03,21.80,156.85
+COK,VNS,COK-VNS,"Kochi, Kerala","Varanasi, Uttar Pradesh",514,112,8.39,21.79,136.06
+IXR,PNQ,IXR-PNQ,"Ranchi, Jharkhand","Pune, Maharashtra",326,71,8.91,21.78,126.10
+PNQ,JAI,PNQ-JAI,"Pune, Maharashtra","Jaipur, Rajasthan",836,182,9.14,21.77,146.51
+DEL,IDR,DEL-IDR,"Delhi, Delhi","Indore, Madhya Pradesh",2537,551,8.10,21.72,170.25
+DEL,GOI,DEL-GOI,"Delhi, Delhi","Goa (Dabolim), Goa",2845,617,8.75,21.69,172.49
+BOM,VNS,BOM-VNS,"Mumbai, Maharashtra","Varanasi, Uttar Pradesh",1923,417,8.58,21.68,163.98
+PNQ,DEL,PNQ-DEL,"Pune, Maharashtra","Delhi, Delhi",5241,1136,8.87,21.68,185.64
+BLR,JAI,BLR-JAI,"Bengaluru, Karnataka","Jaipur, Rajasthan",2544,551,8.52,21.66,169.85
+DEL,NAG,DEL-NAG,"Delhi, Delhi","Nagpur, Maharashtra",2284,493,7.86,21.58,166.94
+DEL,CJB,DEL-CJB,"Delhi, Delhi","Coimbatore, Tamil Nadu",1630,349,8.28,21.41,158.38
+PNQ,IXC,PNQ-IXC,"Pune, Maharashtra","Chandigarh, Chandigarh",543,116,8.57,21.36,134.56
+BOM,TRV,BOM-TRV,"Mumbai, Maharashtra","Thiruvananthapuram, Kerala",1878,401,7.47,21.35,160.97
+DEL,IMF,DEL-IMF,"Delhi, Delhi","Imphal, Manipur",1243,265,7.46,21.32,151.92
+MAA,DEL,MAA-DEL,"Chennai, Tamil Nadu","Delhi, Delhi",10146,2161,8.27,21.30,196.48
+BOM,JAI,BOM-JAI,"Mumbai, Maharashtra","Jaipur, Rajasthan",2842,605,8.25,21.29,169.29
+BOM,IXZ,BOM-IXZ,"Mumbai, Maharashtra","Port Blair, Andaman and Nicobar",1020,217,7.52,21.27,147.40
+SXR,BOM,SXR-BOM,"Srinagar, Jammu and Kashmir","Mumbai, Maharashtra",2150,456,8.36,21.21,162.75
+DIB,DEL,DIB-DEL,"Dibrugarh, Assam","Delhi, Delhi",675,143,8.57,21.19,138.05
+DEL,ATQ,DEL-ATQ,"Delhi, Delhi","Amritsar, Punjab",2390,506,7.63,21.17,164.70
+DEL,VNS,DEL-VNS,"Delhi, Delhi","Varanasi, Uttar Pradesh",3423,723,8.19,21.12,171.90
+CCJ,DEL,CCJ-DEL,"Kozhikode, Kerala","Delhi, Delhi",1665,351,8.39,21.08,156.38
+BLR,BOM,BLR-BOM,"Bengaluru, Karnataka","Mumbai, Maharashtra",15215,3207,7.42,21.08,202.98
+DEL,IXE,DEL-IXE,"Delhi, Delhi","Mangaluru, Karnataka",1287,271,7.45,21.06,150.78
+PNQ,LKO,PNQ-LKO,"Pune, Maharashtra","Lucknow, Uttar Pradesh",699,147,7.62,21.03,137.77
+BOM,MAA,BOM-MAA,"Mumbai, Maharashtra","Chennai, Tamil Nadu",8346,1755,7.88,21.03,189.88
+DEL,LKO,DEL-LKO,"Delhi, Delhi","Lucknow, Uttar Pradesh",5230,1097,7.77,20.98,179.60
+MAA,LKO,MAA-LKO,"Chennai, Tamil Nadu","Lucknow, Uttar Pradesh",1352,283,7.66,20.93,150.92
+VNS,COK,VNS-COK,"Varanasi, Uttar Pradesh","Kochi, Kerala",516,108,7.17,20.93,130.77
+BOM,GOI,BOM-GOI,"Mumbai, Maharashtra","Goa (Dabolim), Goa",3610,755,7.28,20.91,171.32
+BOM,IXB,BOM-IXB,"Mumbai, Maharashtra","Bagdogra, West Bengal",1838,384,7.46,20.89,157.05
+VNS,BOM,VNS-BOM,"Varanasi, Uttar Pradesh","Mumbai, Maharashtra",1932,403,8.04,20.86,157.84
+IXJ,DEL,IXJ-DEL,"Jammu, Jammu and Kashmir","Delhi, Delhi",1938,403,7.41,20.79,157.41
+DEL,BLR,DEL-BLR,"Delhi, Delhi","Bengaluru, Karnataka",18098,3762,7.74,20.79,203.79
+PAT,BOM,PAT-BOM,"Patna, Bihar","Mumbai, Maharashtra",2319,481,7.76,20.74,160.73
+IXC,BOM,IXC-BOM,"Chandigarh, Chandigarh","Mumbai, Maharashtra",2094,434,8.98,20.73,158.50
+PAT,PNQ,PAT-PNQ,"Patna, Bihar","Pune, Maharashtra",584,121,8.43,20.72,132.01
+COK,IXE,COK-IXE,"Kochi, Kerala","Mangaluru, Karnataka",445,92,8.44,20.67,126.12
+COK,JAI,COK-JAI,"Kochi, Kerala","Jaipur, Rajasthan",828,171,6.96,20.65,138.79
+IXZ,DEL,IXZ-DEL,"Port Blair, Andaman and Nicobar","Delhi, Delhi",1198,247,8.17,20.62,146.16
+DEL,HYD,DEL-HYD,"Delhi, Delhi","Hyderabad, Telangana",12535,2580,7.31,20.58,194.22
+BOM,RPR,BOM-RPR,"Mumbai, Maharashtra","Raipur, Chhattisgarh",1303,268,7.18,20.57,147.54
+LKO,BOM,LKO-BOM,"Lucknow, Uttar Pradesh","Mumbai, Maharashtra",2904,597,7.20,20.56,163.93
+GOI,DEL,GOI-DEL,"Goa (Dabolim), Goa","Delhi, Delhi",2941,604,8.22,20.54,164.03
+DEL,IXM,DEL-IXM,"Delhi, Delhi","Madurai, Tamil Nadu",910,186,8.26,20.44,139.29
+HYD,IXR,HYD-IXR,"Hyderabad, Telangana","Ranchi, Jharkhand",788,161,7.55,20.43,136.29
+BLR,IXC,BLR-IXC,"Bengaluru, Karnataka","Chandigarh, Chandigarh",1836,375,7.25,20.42,153.51
+DEL,CCU,DEL-CCU,"Delhi, Delhi","Kolkata, West Bengal",8755,1788,7.60,20.42,185.39
+BOM,HYD,BOM-HYD,"Mumbai, Maharashtra","Hyderabad, Telangana",10394,2121,7.38,20.41,188.74
+IXJ,MAA,IXJ-MAA,"Jammu, Jammu and Kashmir","Chennai, Tamil Nadu",535,109,9.16,20.37,128.03
+DEL,AMD,DEL-AMD,"Delhi, Delhi","Ahmedabad, Gujarat",6282,1278,6.93,20.34,177.92
+AMD,BDQ,AMD-BDQ,"Ahmedabad, Gujarat","Vadodara, Gujarat",487,99,7.68,20.33,125.84
+BLR,COK,BLR-COK,"Bengaluru, Karnataka","Kochi, Kerala",6360,1292,7.18,20.31,177.91
+MAA,BOM,MAA-BOM,"Chennai, Tamil Nadu","Mumbai, Maharashtra",8353,1695,7.28,20.29,183.25
+DEL,IXC,DEL-IXC,"Delhi, Delhi","Chandigarh, Chandigarh",3874,786,8.11,20.29,167.63
+BOM,PNQ,BOM-PNQ,"Mumbai, Maharashtra","Pune, Maharashtra",6429,1303,7.27,20.27,177.72
+CCU,IXJ,CCU-IXJ,"Kolkata, West Bengal","Jammu, Jammu and Kashmir",469,95,6.39,20.26,124.63
+BLR,CCJ,BLR-CCJ,"Bengaluru, Karnataka","Kozhikode, Kerala",1729,350,6.42,20.24,150.93
+HYD,VNS,HYD-VNS,"Hyderabad, Telangana","Varanasi, Uttar Pradesh",1087,220,6.83,20.24,141.51
+COK,IXC,COK-IXC,"Kochi, Kerala","Chandigarh, Chandigarh",633,128,7.76,20.22,130.47
+DEL,GOX,DEL-GOX,"Delhi, Delhi","Goa (Mopa), Goa",2983,603,8.56,20.21,161.74
+BLR,GOI,BLR-GOI,"Bengaluru, Karnataka","Goa (Dabolim), Goa",2144,433,7.03,20.20,154.92
+GOI,PAT,GOI-PAT,"Goa (Dabolim), Goa","Patna, Bihar",342,69,8.26,20.18,117.78
+DEL,BDQ,DEL-BDQ,"Delhi, Delhi","Vadodara, Gujarat",1296,261,7.28,20.14,144.35
+MAA,BHO,MAA-BHO,"Chennai, Tamil Nadu","Bhopal, Madhya Pradesh",547,110,6.88,20.11,126.82
+HYD,SXR,HYD-SXR,"Hyderabad, Telangana","Srinagar, Jammu and Kashmir",1308,263,7.65,20.11,144.31
+DEL,STV,DEL-STV,"Delhi, Delhi","Surat, Gujarat",876,176,6.55,20.09,136.15
+BLR,IXE,BLR-IXE,"Bengaluru, Karnataka","Mangaluru, Karnataka",1391,279,7.41,20.06,145.19
+ATQ,PNQ,ATQ-PNQ,"Amritsar, Punjab","Pune, Maharashtra",379,76,7.33,20.05,119.12
+BLR,TRZ,BLR-TRZ,"Bengaluru, Karnataka","Tiruchirappalli, Tamil Nadu",983,197,6.48,20.04,138.11
+DEL,RPR,DEL-RPR,"Delhi, Delhi","Raipur, Chhattisgarh",1578,316,7.78,20.03,147.48
+PNQ,PAT,PNQ-PAT,"Pune, Maharashtra","Patna, Bihar",625,125,7.92,20.00,128.79
+BOM,BLR,BOM-BLR,"Mumbai, Maharashtra","Bengaluru, Karnataka",14945,2988,6.86,19.99,192.18
+DEL,UDR,DEL-UDR,"Delhi, Delhi","Udaipur, Rajasthan",1857,371,6.95,19.98,150.38
+BOM,TRZ,BOM-TRZ,"Mumbai, Maharashtra","Tiruchirappalli, Tamil Nadu",776,155,8.16,19.97,132.94
+BOM,IMF,BOM-IMF,"Mumbai, Maharashtra","Imphal, Manipur",1023,204,6.44,19.94,138.22
+BOM,BDQ,BOM-BDQ,"Mumbai, Maharashtra","Vadodara, Gujarat",1615,322,7.27,19.94,147.30
+MAA,PNQ,MAA-PNQ,"Chennai, Tamil Nadu","Pune, Maharashtra",2134,425,6.74,19.92,152.68
+BLR,DIB,BLR-DIB,"Bengaluru, Karnataka","Dibrugarh, Assam",488,97,7.09,19.88,123.09
+DEL,PAT,DEL-PAT,"Delhi, Delhi","Patna, Bihar",2843,565,6.59,19.87,158.05
+AMD,DEL,AMD-DEL,"Ahmedabad, Gujarat","Delhi, Delhi",6246,1241,6.79,19.87,173.65
+IXR,HYD,IXR-HYD,"Ranchi, Jharkhand","Hyderabad, Telangana",878,174,7.40,19.82,134.34
+JAI,PNQ,JAI-PNQ,"Jaipur, Rajasthan","Pune, Maharashtra",753,149,6.40,19.79,131.10
+BOM,GOX,BOM-GOX,"Mumbai, Maharashtra","Goa (Mopa), Goa",3573,707,6.96,19.79,161.89
+BOM,STV,BOM-STV,"Mumbai, Maharashtra","Surat, Gujarat",1117,221,7.08,19.79,138.88
+IXM,MAA,IXM-MAA,"Madurai, Tamil Nadu","Chennai, Tamil Nadu",556,110,6.65,19.78,125.09
+BOM,COK,BOM-COK,"Mumbai, Maharashtra","Kochi, Kerala",4773,944,7.27,19.78,167.54
+BLR,IXR,BLR-IXR,"Bengaluru, Karnataka","Ranchi, Jharkhand",1229,243,6.91,19.77,140.67
+VNS,HYD,VNS-HYD,"Varanasi, Uttar Pradesh","Hyderabad, Telangana",1124,222,6.65,19.75,138.76
+LKO,PNQ,LKO-PNQ,"Lucknow, Uttar Pradesh","Pune, Maharashtra",740,146,6.21,19.73,130.37
+AMD,BOM,AMD-BOM,"Ahmedabad, Gujarat","Mumbai, Maharashtra",7756,1530,6.52,19.73,176.68
+JAI,DEL,JAI-DEL,"Jaipur, Rajasthan","Delhi, Delhi",5307,1046,7.20,19.71,169.05
+BOM,AMD,BOM-AMD,"Mumbai, Maharashtra","Ahmedabad, Gujarat",7859,1548,6.64,19.70,176.67
+IXR,CCU,IXR-CCU,"Ranchi, Jharkhand","Kolkata, West Bengal",890,175,6.20,19.66,133.56
+PNQ,CJB,PNQ-CJB,"Pune, Maharashtra","Coimbatore, Tamil Nadu",346,68,6.25,19.65,114.96
+IXL,HYD,IXL-HYD,"Leh, Ladakh","Hyderabad, Telangana",341,67,6.68,19.65,114.64
+BOM,NAG,BOM-NAG,"Mumbai, Maharashtra","Nagpur, Maharashtra",2883,566,6.53,19.63,156.41
+HYD,IXJ,HYD-IXJ,"Hyderabad, Telangana","Jammu, Jammu and Kashmir",652,128,6.00,19.63,127.25
+MAA,VNS,MAA-VNS,"Chennai, Tamil Nadu","Varanasi, Uttar Pradesh",938,184,6.78,19.62,134.27
+TRZ,DEL,TRZ-DEL,"Tiruchirappalli, Tamil Nadu","Delhi, Delhi",893,175,6.76,19.60,133.17
+BOM,CCU,BOM-CCU,"Mumbai, Maharashtra","Kolkata, West Bengal",7315,1433,6.77,19.59,174.31
+TRV,COK,TRV-COK,"Thiruvananthapuram, Kerala","Kochi, Kerala",797,156,6.22,19.57,130.79
+IXM,DEL,IXM-DEL,"Madurai, Tamil Nadu","Delhi, Delhi",880,172,6.95,19.55,132.54
+IXE,MAA,IXE-MAA,"Mangaluru, Karnataka","Chennai, Tamil Nadu",778,152,5.81,19.54,130.08
+DED,CCU,DED-CCU,"Dehradun, Uttarakhand","Kolkata, West Bengal",502,98,6.63,19.52,121.44
+DEL,SXR,DEL-SXR,"Delhi, Delhi","Srinagar, Jammu and Kashmir",3809,742,7.05,19.48,160.62
+CJB,MAA,CJB-MAA,"Coimbatore, Tamil Nadu","Chennai, Tamil Nadu",1017,198,6.52,19.47,134.83
+BOM,IDR,BOM-IDR,"Mumbai, Maharashtra","Indore, Madhya Pradesh",3216,626,6.79,19.47,157.20
+IXC,MAA,IXC-MAA,"Chandigarh, Chandigarh","Chennai, Tamil Nadu",1054,205,7.45,19.45,135.40
+JAI,GOX,JAI-GOX,"Jaipur, Rajasthan","Goa (Mopa), Goa",396,77,7.16,19.44,116.35
+PNQ,COK,PNQ-COK,"Pune, Maharashtra","Kochi, Kerala",1122,218,7.21,19.43,136.47
+BLR,PAT,BLR-PAT,"Bengaluru, Karnataka","Patna, Bihar",2148,417,6.64,19.41,148.95
+HYD,IXL,HYD-IXL,"Hyderabad, Telangana","Leh, Ladakh",335,65,5.49,19.40,112.87
+BOM,IXM,BOM-IXM,"Mumbai, Maharashtra","Madurai, Tamil Nadu",691,134,7.15,19.39,126.82
+BLR,MAA,BLR-MAA,"Bengaluru, Karnataka","Chennai, Tamil Nadu",11064,2145,6.43,19.39,180.52
+BBI,DEL,BBI-DEL,"Bhubaneswar, Odisha","Delhi, Delhi",2925,566,7.20,19.35,154.44
+CCU,DEL,CCU-DEL,"Kolkata, West Bengal","Delhi, Delhi",8911,1723,7.03,19.34,175.86
+LKO,DEL,LKO-DEL,"Lucknow, Uttar Pradesh","Delhi, Delhi",5149,995,6.75,19.32,165.16
+IDR,DEL,IDR-DEL,"Indore, Madhya Pradesh","Delhi, Delhi",2495,482,6.74,19.32,151.12
+DEL,IXL,DEL-IXL,"Delhi, Delhi","Leh, Ladakh",1036,200,6.71,19.31,134.06
+DEL,JAI,DEL-JAI,"Delhi, Delhi","Jaipur, Rajasthan",5143,992,6.75,19.29,164.83
+COK,RPR,COK-RPR,"Kochi, Kerala","Raipur, Chhattisgarh",363,70,7.11,19.28,113.72
+DEL,TRZ,DEL-TRZ,"Delhi, Delhi","Tiruchirappalli, Tamil Nadu",862,166,7.03,19.26,130.19
+DEL,GAU,DEL-GAU,"Delhi, Delhi","Guwahati, Assam",3470,668,6.73,19.25,156.94
+BLR,LKO,BLR-LKO,"Bengaluru, Karnataka","Lucknow, Uttar Pradesh",2577,496,6.94,19.25,151.18
+AMD,PAT,AMD-PAT,"Ahmedabad, Gujarat","Patna, Bihar",717,138,6.40,19.25,126.58
+HYD,IXZ,HYD-IXZ,"Hyderabad, Telangana","Port Blair, Andaman and Nicobar",655,126,7.01,19.24,124.77
+BLR,IXM,BLR-IXM,"Bengaluru, Karnataka","Madurai, Tamil Nadu",993,191,6.37,19.23,132.75
+CCJ,PNQ,CCJ-PNQ,"Kozhikode, Kerala","Pune, Maharashtra",338,65,5.13,19.23,112.04
+DED,DEL,DED-DEL,"Dehradun, Uttarakhand","Delhi, Delhi",1853,356,6.23,19.21,144.57
+CJB,BOM,CJB-BOM,"Coimbatore, Tamil Nadu","Mumbai, Maharashtra",1354,260,7.04,19.20,138.48
+JAI,BBI,JAI-BBI,"Jaipur, Rajasthan","Bhubaneswar, Odisha",391,75,7.04,19.18,114.54
+BLR,PNQ,BLR-PNQ,"Bengaluru, Karnataka","Pune, Maharashtra",3813,731,6.27,19.17,158.09
+PNQ,MAA,PNQ-MAA,"Pune, Maharashtra","Chennai, Tamil Nadu",2099,402,6.62,19.15,146.51
+HYD,DEL,HYD-DEL,"Hyderabad, Telangana","Delhi, Delhi",12610,2414,6.59,19.14,180.76
+TRV,DEL,TRV-DEL,"Thiruvananthapuram, Kerala","Delhi, Delhi",2237,428,7.04,19.13,147.58
+BOM,GAU,BOM-GAU,"Mumbai, Maharashtra","Guwahati, Assam",2920,558,6.53,19.11,152.49
+HYD,BOM,HYD-BOM,"Hyderabad, Telangana","Mumbai, Maharashtra",10355,1972,6.50,19.04,176.07
+SXR,AMD,SXR-AMD,"Srinagar, Jammu and Kashmir","Ahmedabad, Gujarat",636,121,7.04,19.03,122.84
+CCJ,MAA,CCJ-MAA,"Kozhikode, Kerala","Chennai, Tamil Nadu",941,179,7.58,19.02,130.26
+LKO,COK,LKO-COK,"Lucknow, Uttar Pradesh","Kochi, Kerala",794,151,6.19,19.02,127.01
+COK,IDR,COK-IDR,"Kochi, Kerala","Indore, Madhya Pradesh",605,115,5.70,19.01,121.78
+CCU,SXR,CCU-SXR,"Kolkata, West Bengal","Srinagar, Jammu and Kashmir",900,171,7.19,19.00,129.27
+SXR,MAA,SXR-MAA,"Srinagar, Jammu and Kashmir","Chennai, Tamil Nadu",1111,211,7.00,18.99,133.21
+HYD,IXC,HYD-IXC,"Hyderabad, Telangana","Chandigarh, Chandigarh",1269,241,5.88,18.99,135.73
+BOM,CCJ,BOM-CCJ,"Mumbai, Maharashtra","Kozhikode, Kerala",1327,252,6.61,18.99,136.57
+IXB,BOM,IXB-BOM,"Bagdogra, West Bengal","Mumbai, Maharashtra",1870,355,6.77,18.98,143.03
+MAA,CCJ,MAA-CCJ,"Chennai, Tamil Nadu","Kozhikode, Kerala",1008,191,6.95,18.95,131.06
+PNQ,BHO,PNQ-BHO,"Pune, Maharashtra","Bhopal, Madhya Pradesh",396,75,6.07,18.94,113.33
+UDR,BOM,UDR-BOM,"Udaipur, Rajasthan","Mumbai, Maharashtra",1030,195,6.42,18.93,131.36
+BLR,IXJ,BLR-IXJ,"Bengaluru, Karnataka","Jammu, Jammu and Kashmir",893,169,6.74,18.92,128.61
+PNQ,BOM,PNQ-BOM,"Pune, Maharashtra","Mumbai, Maharashtra",6345,1199,6.66,18.90,165.45
+SXR,DEL,SXR-DEL,"Srinagar, Jammu and Kashmir","Delhi, Delhi",3882,733,6.60,18.88,156.05
+IMF,DEL,IMF-DEL,"Imphal, Manipur","Delhi, Delhi",1282,242,6.61,18.88,135.10
+COK,TRV,COK-TRV,"Kochi, Kerala","Thiruvananthapuram, Kerala",832,157,6.70,18.87,126.90
+IXB,DEL,IXB-DEL,"Bagdogra, West Bengal","Delhi, Delhi",2253,425,6.61,18.86,145.64
+COK,MAA,COK-MAA,"Kochi, Kerala","Chennai, Tamil Nadu",3642,687,6.33,18.86,154.69
+ATQ,CCU,ATQ-CCU,"Amritsar, Punjab","Kolkata, West Bengal",541,102,6.22,18.85,118.69
+MAA,IMF,MAA-IMF,"Chennai, Tamil Nadu","Imphal, Manipur",515,97,5.84,18.83,117.65
+MAA,DED,MAA-DED,"Chennai, Tamil Nadu","Dehradun, Uttarakhand",478,90,6.66,18.83,116.20
+DEL,BHO,DEL-BHO,"Delhi, Delhi","Bhopal, Madhya Pradesh",1270,239,6.69,18.82,134.51
+CCU,BOM,CCU-BOM,"Kolkata, West Bengal","Mumbai, Maharashtra",7282,1370,6.35,18.81,167.31
+AMD,LKO,AMD-LKO,"Ahmedabad, Gujarat","Lucknow, Uttar Pradesh",920,173,6.65,18.80,128.35
+RPR,DEL,RPR-DEL,"Raipur, Chhattisgarh","Delhi, Delhi",1617,304,7.00,18.80,138.91
+SXR,COK,SXR-COK,"Srinagar, Jammu and Kashmir","Kochi, Kerala",596,112,8.27,18.79,120.12
+CCJ,HYD,CCJ-HYD,"Kozhikode, Kerala","Hyderabad, Telangana",1184,222,6.59,18.75,132.70
+MAA,COK,MAA-COK,"Chennai, Tamil Nadu","Kochi, Kerala",3545,664,6.50,18.73,153.10
+IXJ,BLR,IXJ-BLR,"Jammu, Jammu and Kashmir","Bengaluru, Karnataka",908,170,6.28,18.72,127.54
+MAA,SXR,MAA-SXR,"Chennai, Tamil Nadu","Srinagar, Jammu and Kashmir",1079,202,6.68,18.72,130.76
+ATQ,DEL,ATQ-DEL,"Amritsar, Punjab","Delhi, Delhi",2436,456,6.37,18.72,145.98
+HBX,DEL,HBX-DEL,"Hubballi, Karnataka","Delhi, Delhi",738,138,6.76,18.70,123.51
+GAU,DEL,GAU-DEL,"Guwahati, Assam","Delhi, Delhi",3504,655,6.88,18.69,152.57
+COK,VTZ,COK-VTZ,"Kochi, Kerala","Visakhapatnam, Andhra Pradesh",675,126,6.03,18.67,121.64
+BDQ,DEL,BDQ-DEL,"Vadodara, Gujarat","Delhi, Delhi",1249,233,7.34,18.65,133.03
+COK,BOM,COK-BOM,"Kochi, Kerala","Mumbai, Maharashtra",4651,867,6.20,18.64,157.43
+COK,CCU,COK-CCU,"Kochi, Kerala","Kolkata, West Bengal",2103,392,5.90,18.64,142.63
+BBI,MAA,BBI-MAA,"Bhubaneswar, Odisha","Chennai, Tamil Nadu",1127,210,5.39,18.63,130.96
+MAA,TRV,MAA-TRV,"Chennai, Tamil Nadu","Thiruvananthapuram, Kerala",1461,272,6.75,18.62,135.68
+JAI,AMD,JAI-AMD,"Jaipur, Rajasthan","Ahmedabad, Gujarat",881,164,5.74,18.62,126.25
+BOM,UDR,BOM-UDR,"Mumbai, Maharashtra","Udaipur, Rajasthan",1037,193,5.50,18.61,129.26
+MAA,VTZ,MAA-VTZ,"Chennai, Tamil Nadu","Visakhapatnam, Andhra Pradesh",1188,221,5.82,18.60,131.72
+GOI,HYD,GOI-HYD,"Goa (Dabolim), Goa","Hyderabad, Telangana",1473,274,5.68,18.60,135.71
+DEL,BBI,DEL-BBI,"Delhi, Delhi","Bhubaneswar, Odisha",2889,537,6.19,18.59,148.13
+COK,CJB,COK-CJB,"Kochi, Kerala","Coimbatore, Tamil Nadu",565,105,7.08,18.58,117.80
+CCJ,COK,CCJ-COK,"Kozhikode, Kerala","Kochi, Kerala",582,108,6.30,18.56,118.17
+CCJ,BOM,CCJ-BOM,"Kozhikode, Kerala","Mumbai, Maharashtra",1333,247,6.08,18.53,133.34
+HYD,ATQ,HYD-ATQ,"Hyderabad, Telangana","Amritsar, Punjab",783,145,6.03,18.52,123.41
+BBI,BOM,BBI-BOM,"Bhubaneswar, Odisha","Mumbai, Maharashtra",2387,441,6.18,18.48,143.70
+GOI,PNQ,GOI-PNQ,"Goa (Dabolim), Goa","Pune, Maharashtra",916,169,6.08,18.45,125.85
+IXC,AMD,IXC-AMD,"Chandigarh, Chandigarh","Ahmedabad, Gujarat",646,119,6.31,18.42,119.23
+CJB,COK,CJB-COK,"Coimbatore, Tamil Nadu","Kochi, Kerala",570,105,5.95,18.42,116.93
+AMD,PNQ,AMD-PNQ,"Ahmedabad, Gujarat","Pune, Maharashtra",1908,351,6.01,18.40,138.97
+AMD,IXC,AMD-IXC,"Ahmedabad, Gujarat","Chandigarh, Chandigarh",685,126,6.71,18.39,120.13
+COK,AMD,COK-AMD,"Kochi, Kerala","Ahmedabad, Gujarat",1441,265,6.52,18.39,133.76
+AMD,GOI,AMD-GOI,"Ahmedabad, Gujarat","Goa (Dabolim), Goa",1088,200,6.03,18.38,128.55
+BLR,BDQ,BLR-BDQ,"Bengaluru, Karnataka","Vadodara, Gujarat",936,172,5.15,18.38,125.74
+PNQ,SXR,PNQ-SXR,"Pune, Maharashtra","Srinagar, Jammu and Kashmir",566,104,7.19,18.37,116.50
+DEL,VTZ,DEL-VTZ,"Delhi, Delhi","Visakhapatnam, Andhra Pradesh",1965,361,5.87,18.37,139.32
+PNQ,BLR,PNQ-BLR,"Pune, Maharashtra","Bengaluru, Karnataka",3867,710,5.88,18.36,151.67
+AMD,MAA,AMD-MAA,"Ahmedabad, Gujarat","Chennai, Tamil Nadu",2637,484,5.63,18.35,144.59
+ATQ,AMD,ATQ-AMD,"Amritsar, Punjab","Ahmedabad, Gujarat",420,77,6.24,18.33,110.78
+CCJ,AMD,CCJ-AMD,"Kozhikode, Kerala","Ahmedabad, Gujarat",420,77,6.67,18.33,110.78
+MAA,IXC,MAA-IXC,"Chennai, Tamil Nadu","Chandigarh, Chandigarh",1075,197,5.72,18.33,127.93
+DEL,IXJ,DEL-IXJ,"Delhi, Delhi","Jammu, Jammu and Kashmir",1872,342,6.42,18.27,137.66
+SXR,BLR,SXR-BLR,"Srinagar, Jammu and Kashmir","Bengaluru, Karnataka",1916,350,5.61,18.27,138.07
+BBI,COK,BBI-COK,"Bhubaneswar, Odisha","Kochi, Kerala",657,120,6.14,18.26,118.52
+SXR,HYD,SXR-HYD,"Srinagar, Jammu and Kashmir","Hyderabad, Telangana",1325,242,6.16,18.26,131.32
+DED,MAA,DED-MAA,"Dehradun, Uttarakhand","Chennai, Tamil Nadu",504,92,5.85,18.25,113.62
+ATQ,BLR,ATQ-BLR,"Amritsar, Punjab","Bengaluru, Karnataka",1195,218,5.72,18.24,129.28
+MAA,BBI,MAA-BBI,"Chennai, Tamil Nadu","Bhubaneswar, Odisha",1126,205,5.15,18.21,127.94
+IDR,PNQ,IDR-PNQ,"Indore, Madhya Pradesh","Pune, Maharashtra",868,158,5.13,18.20,123.18
+CCU,PAT,CCU-PAT,"Kolkata, West Bengal","Patna, Bihar",1611,293,6.27,18.19,134.32
+IXR,AMD,IXR-AMD,"Ranchi, Jharkhand","Ahmedabad, Gujarat",391,71,6.08,18.16,108.43
+RPR,COK,RPR-COK,"Raipur, Chhattisgarh","Kochi, Kerala",358,65,6.36,18.16,106.82
+COK,NAG,COK-NAG,"Kochi, Kerala","Nagpur, Maharashtra",540,98,6.10,18.15,114.21
+PNQ,VNS,PNQ-VNS,"Pune, Maharashtra","Varanasi, Uttar Pradesh",496,90,6.93,18.15,112.66
+PAT,IXB,PAT-IXB,"Patna, Bihar","Bagdogra, West Bengal",375,68,5.45,18.13,107.52
+RPR,MAA,RPR-MAA,"Raipur, Chhattisgarh","Chennai, Tamil Nadu",662,120,6.31,18.13,117.77
+IXL,BLR,IXL-BLR,"Leh, Ladakh","Bengaluru, Karnataka",486,88,4.93,18.11,112.05
+IXM,BOM,IXM-BOM,"Madurai, Tamil Nadu","Mumbai, Maharashtra",707,128,4.85,18.10,118.81
+HYD,JAI,HYD-JAI,"Hyderabad, Telangana","Jaipur, Rajasthan",1820,329,5.31,18.08,135.71
+IXZ,BOM,IXZ-BOM,"Port Blair, Andaman and Nicobar","Mumbai, Maharashtra",1018,184,5.62,18.07,125.20
+BOM,DED,BOM-DED,"Mumbai, Maharashtra","Dehradun, Uttarakhand",1024,185,5.48,18.07,125.24
+ATQ,BOM,ATQ-BOM,"Amritsar, Punjab","Mumbai, Maharashtra",1263,228,5.77,18.05,128.93
+AMD,VNS,AMD-VNS,"Ahmedabad, Gujarat","Varanasi, Uttar Pradesh",554,100,5.13,18.05,114.06
+CCU,PNQ,CCU-PNQ,"Kolkata, West Bengal","Pune, Maharashtra",1907,344,6.32,18.04,136.26
+COK,BLR,COK-BLR,"Kochi, Kerala","Bengaluru, Karnataka",6371,1149,6.35,18.03,157.98
+JAI,IXC,JAI-IXC,"Jaipur, Rajasthan","Chandigarh, Chandigarh",577,104,6.24,18.02,114.63
+TRV,MAA,TRV-MAA,"Thiruvananthapuram, Kerala","Chennai, Tamil Nadu",1343,242,6.40,18.02,129.80
+DIB,BOM,DIB-BOM,"Dibrugarh, Assam","Mumbai, Maharashtra",572,103,5.90,18.01,114.36
+VTZ,BOM,VTZ-BOM,"Visakhapatnam, Andhra Pradesh","Mumbai, Maharashtra",1662,299,5.12,17.99,133.42
+BHO,DEL,BHO-DEL,"Bhopal, Madhya Pradesh","Delhi, Delhi",1246,224,6.38,17.98,128.15
+AMD,SXR,AMD-SXR,"Ahmedabad, Gujarat","Srinagar, Jammu and Kashmir",640,115,7.43,17.97,116.13
+PAT,MAA,PAT-MAA,"Patna, Bihar","Chennai, Tamil Nadu",1153,207,6.51,17.95,126.59
+BLR,CJB,BLR-CJB,"Bengaluru, Karnataka","Coimbatore, Tamil Nadu",1777,319,5.87,17.95,134.34
+IXM,HYD,IXM-HYD,"Madurai, Tamil Nadu","Hyderabad, Telangana",680,122,5.46,17.94,117.04
+MAA,IXB,MAA-IXB,"Chennai, Tamil Nadu","Bagdogra, West Bengal",970,174,5.04,17.94,123.38
+CCU,IXR,CCU-IXR,"Kolkata, West Bengal","Ranchi, Jharkhand",775,139,6.34,17.94,119.35
+AMD,ATQ,AMD-ATQ,"Ahmedabad, Gujarat","Amritsar, Punjab",385,69,5.99,17.92,106.74
+IXZ,BLR,IXZ-BLR,"Port Blair, Andaman and Nicobar","Bengaluru, Karnataka",938,168,6.33,17.91,122.59
+GOX,MAA,GOX-MAA,"Goa (Mopa), Goa","Chennai, Tamil Nadu",1257,225,6.48,17.90,127.76
+LKO,BLR,LKO-BLR,"Lucknow, Uttar Pradesh","Bengaluru, Karnataka",2661,476,5.79,17.89,141.08
+HYD,PNQ,HYD-PNQ,"Hyderabad, Telangana","Pune, Maharashtra",2703,483,5.61,17.87,141.21
+HYD,COK,HYD-COK,"Hyderabad, Telangana","Kochi, Kerala",4476,799,6.07,17.85,150.07
+IXE,HYD,IXE-HYD,"Mangaluru, Karnataka","Hyderabad, Telangana",953,170,5.77,17.84,122.38
+GOI,BOM,GOI-BOM,"Goa (Dabolim), Goa","Mumbai, Maharashtra",3522,628,5.71,17.83,145.63
+GAU,COK,GAU-COK,"Guwahati, Assam","Kochi, Kerala",809,144,5.77,17.80,119.21
+BHO,AMD,BHO-AMD,"Bhopal, Madhya Pradesh","Ahmedabad, Gujarat",489,87,4.64,17.79,110.21
+ATQ,HYD,ATQ-HYD,"Amritsar, Punjab","Hyderabad, Telangana",782,139,6.23,17.77,118.44
+PNQ,RPR,PNQ-RPR,"Pune, Maharashtra","Raipur, Chhattisgarh",332,59,4.81,17.77,103.22
+IMF,BOM,IMF-BOM,"Imphal, Manipur","Mumbai, Maharashtra",1030,183,5.95,17.77,123.27
+UDR,MAA,UDR-MAA,"Udaipur, Rajasthan","Chennai, Tamil Nadu",518,92,5.67,17.76,111.04
+IXC,DEL,IXC-DEL,"Chandigarh, Chandigarh","Delhi, Delhi",4015,713,5.62,17.76,147.36
+HYD,MAA,HYD-MAA,"Hyderabad, Telangana","Chennai, Tamil Nadu",7696,1366,5.64,17.75,158.83
+IXB,PAT,IXB-PAT,"Bagdogra, West Bengal","Patna, Bihar",417,74,6.18,17.75,107.10
+TRZ,MAA,TRZ-MAA,"Tiruchirappalli, Tamil Nadu","Chennai, Tamil Nadu",558,99,6.07,17.74,112.24
+MAA,HYD,MAA-HYD,"Chennai, Tamil Nadu","Hyderabad, Telangana",7668,1358,5.26,17.71,158.41
+UDR,DEL,UDR-DEL,"Udaipur, Rajasthan","Delhi, Delhi",1881,333,6.31,17.70,133.48
+VTZ,DEL,VTZ-DEL,"Visakhapatnam, Andhra Pradesh","Delhi, Delhi",1983,351,6.01,17.70,134.40
+IDR,JAI,IDR-JAI,"Indore, Madhya Pradesh","Jaipur, Rajasthan",345,61,5.90,17.68,103.37
+RPR,BOM,RPR-BOM,"Raipur, Chhattisgarh","Mumbai, Maharashtra",1296,229,5.30,17.67,126.65
+LKO,HYD,LKO-HYD,"Lucknow, Uttar Pradesh","Hyderabad, Telangana",1800,318,6.15,17.67,132.43
+IXC,SXR,IXC-SXR,"Chandigarh, Chandigarh","Srinagar, Jammu and Kashmir",385,68,6.85,17.66,105.19
+NAG,DEL,NAG-DEL,"Nagpur, Maharashtra","Delhi, Delhi",2261,399,5.63,17.65,136.31
+MAA,NAG,MAA-NAG,"Chennai, Tamil Nadu","Nagpur, Maharashtra",890,157,5.71,17.64,119.82
+BLR,STV,BLR-STV,"Bengaluru, Karnataka","Surat, Gujarat",635,112,4.25,17.64,113.86
+IXL,BOM,IXL-BOM,"Leh, Ladakh","Mumbai, Maharashtra",601,106,5.41,17.64,112.88
+NAG,MAA,NAG-MAA,"Nagpur, Maharashtra","Chennai, Tamil Nadu",930,164,5.49,17.63,120.55
+COK,BBI,COK-BBI,"Kochi, Kerala","Bhubaneswar, Odisha",681,120,6.59,17.62,114.98
+CCU,IXC,CCU-IXC,"Kolkata, West Bengal","Chandigarh, Chandigarh",948,167,5.43,17.62,120.77
+PAT,DEL,PAT-DEL,"Patna, Bihar","Delhi, Delhi",2885,507,6.12,17.57,140.02
+MAA,ATQ,MAA-ATQ,"Chennai, Tamil Nadu","Amritsar, Punjab",666,117,4.82,17.57,114.24
+DEL,IXB,DEL-IXB,"Delhi, Delhi","Bagdogra, West Bengal",2267,398,6.19,17.56,135.65
+HYD,GOX,HYD-GOX,"Hyderabad, Telangana","Goa (Mopa), Goa",1464,257,6.41,17.55,127.97
+COK,CCJ,COK-CCJ,"Kochi, Kerala","Kozhikode, Kerala",547,96,5.64,17.55,110.68
+IXE,BLR,IXE-BLR,"Mangaluru, Karnataka","Bengaluru, Karnataka",1392,244,5.00,17.53,126.89
+IXL,DEL,IXL-DEL,"Leh, Ladakh","Delhi, Delhi",976,171,5.73,17.52,120.62
+HYD,TRV,HYD-TRV,"Hyderabad, Telangana","Thiruvananthapuram, Kerala",1719,301,4.74,17.51,130.45
+BOM,PAT,BOM-PAT,"Mumbai, Maharashtra","Patna, Bihar",2407,421,6.05,17.49,136.19
+GOI,MAA,GOI-MAA,"Goa (Dabolim), Goa","Chennai, Tamil Nadu",1224,214,6.21,17.48,124.32
+HYD,CJB,HYD-CJB,"Hyderabad, Telangana","Coimbatore, Tamil Nadu",1202,210,5.15,17.47,123.91
+MAA,IDR,MAA-IDR,"Chennai, Tamil Nadu","Indore, Madhya Pradesh",1071,187,5.20,17.46,121.83
+IXC,CCU,IXC-CCU,"Chandigarh, Chandigarh","Kolkata, West Bengal",946,165,5.87,17.44,119.53
+COK,PNQ,COK-PNQ,"Kochi, Kerala","Pune, Maharashtra",1231,214,5.46,17.38,123.71
+COK,SXR,COK-SXR,"Kochi, Kerala","Srinagar, Jammu and Kashmir",604,105,4.84,17.38,111.35
+MAA,IXR,MAA-IXR,"Chennai, Tamil Nadu","Ranchi, Jharkhand",679,118,6.37,17.38,113.34
+IXR,BLR,IXR-BLR,"Ranchi, Jharkhand","Bengaluru, Karnataka",1105,192,6.71,17.38,121.78
+HBX,BOM,HBX-BOM,"Hubballi, Karnataka","Mumbai, Maharashtra",518,90,4.64,17.37,108.62
+PAT,GOX,PAT-GOX,"Patna, Bihar","Goa (Mopa), Goa",334,58,6.35,17.37,100.96
+HYD,CCJ,HYD-CCJ,"Hyderabad, Telangana","Kozhikode, Kerala",1221,212,5.61,17.36,123.42
+DEL,IXR,DEL-IXR,"Delhi, Delhi","Ranchi, Jharkhand",1538,267,5.30,17.36,127.40
+LKO,IXC,LKO-IXC,"Lucknow, Uttar Pradesh","Chandigarh, Chandigarh",559,97,5.62,17.35,109.80
+COK,LKO,COK-LKO,"Kochi, Kerala","Lucknow, Uttar Pradesh",786,136,6.59,17.30,115.38
+BOM,BHO,BOM-BHO,"Mumbai, Maharashtra","Bhopal, Madhya Pradesh",1614,279,5.07,17.29,127.70
+GOI,AMD,GOI-AMD,"Goa (Dabolim), Goa","Ahmedabad, Gujarat",1031,178,5.47,17.26,119.80
+CCU,MAA,CCU-MAA,"Kolkata, West Bengal","Chennai, Tamil Nadu",3576,616,4.99,17.23,140.95
+IXR,MAA,IXR-MAA,"Ranchi, Jharkhand","Chennai, Tamil Nadu",633,109,6.14,17.22,111.10
+CCU,VNS,CCU-VNS,"Kolkata, West Bengal","Varanasi, Uttar Pradesh",814,140,4.83,17.20,115.29
+UDR,HYD,UDR-HYD,"Udaipur, Rajasthan","Hyderabad, Telangana",634,109,3.99,17.19,110.95
+PNQ,HYD,PNQ-HYD,"Pune, Maharashtra","Hyderabad, Telangana",2741,471,5.40,17.18,136.03
+IXC,BLR,IXC-BLR,"Chandigarh, Chandigarh","Bengaluru, Karnataka",1915,329,5.30,17.18,129.85
+CCU,CCJ,CCU-CCJ,"Kolkata, West Bengal","Kozhikode, Kerala",524,90,5.60,17.18,107.58
+PNQ,AMD,PNQ-AMD,"Pune, Maharashtra","Ahmedabad, Gujarat",2009,345,5.00,17.17,130.61
+JAI,GOI,JAI-GOI,"Jaipur, Rajasthan","Goa (Dabolim), Goa",396,68,4.22,17.17,102.75
+COK,HYD,COK-HYD,"Kochi, Kerala","Hyderabad, Telangana",4287,736,5.52,17.17,143.59
+TRV,BOM,TRV-BOM,"Thiruvananthapuram, Kerala","Mumbai, Maharashtra",1888,324,5.60,17.16,129.46
+STV,BOM,STV-BOM,"Surat, Gujarat","Mumbai, Maharashtra",1067,183,5.79,17.15,119.60
+BLR,BHO,BLR-BHO,"Bengaluru, Karnataka","Bhopal, Madhya Pradesh",875,150,4.96,17.14,116.15
+MAA,IXE,MAA-IXE,"Chennai, Tamil Nadu","Mangaluru, Karnataka",782,134,5.83,17.14,114.18
+CCJ,BLR,CCJ-BLR,"Kozhikode, Kerala","Bengaluru, Karnataka",1769,303,5.03,17.13,128.10
+MAA,IXJ,MAA-IXJ,"Chennai, Tamil Nadu","Jammu, Jammu and Kashmir",526,90,5.61,17.11,107.23
+COK,IXB,COK-IXB,"Kochi, Kerala","Bagdogra, West Bengal",544,93,6.02,17.10,107.72
+MAA,JAI,MAA-JAI,"Chennai, Tamil Nadu","Jaipur, Rajasthan",1417,242,4.99,17.08,123.94
+MAA,GOI,MAA-GOI,"Chennai, Tamil Nadu","Goa (Dabolim), Goa",1142,195,5.50,17.08,120.23
+DEL,DIB,DEL-DIB,"Delhi, Delhi","Dibrugarh, Assam",738,126,4.77,17.07,112.77
+CCU,DIB,CCU-DIB,"Kolkata, West Bengal","Dibrugarh, Assam",375,64,4.49,17.07,101.20
+CCJ,CCU,CCJ-CCU,"Kozhikode, Kerala","Kolkata, West Bengal",587,100,5.65,17.04,108.63
+AMD,COK,AMD-COK,"Ahmedabad, Gujarat","Kochi, Kerala",1482,252,5.09,17.00,124.16
+CCU,IDR,CCU-IDR,"Kolkata, West Bengal","Indore, Madhya Pradesh",936,159,4.72,16.99,116.24
+BLR,CCU,BLR-CCU,"Bengaluru, Karnataka","Kolkata, West Bengal",6465,1096,4.42,16.95,148.75
+TRV,AMD,TRV-AMD,"Thiruvananthapuram, Kerala","Ahmedabad, Gujarat",561,95,4.53,16.93,107.22
+GAU,IXC,GAU-IXC,"Guwahati, Assam","Chandigarh, Chandigarh",378,64,4.58,16.93,100.53
+JAI,VNS,JAI-VNS,"Jaipur, Rajasthan","Varanasi, Uttar Pradesh",461,78,7.33,16.92,103.81
+IXR,DEL,IXR-DEL,"Ranchi, Jharkhand","Delhi, Delhi",1614,273,4.73,16.91,124.95
+PNQ,ATQ,PNQ-ATQ,"Pune, Maharashtra","Amritsar, Punjab",367,62,6.50,16.89,99.81
+BLR,NAG,BLR-NAG,"Bengaluru, Karnataka","Nagpur, Maharashtra",1635,276,4.87,16.88,124.92
+LKO,MAA,LKO-MAA,"Lucknow, Uttar Pradesh","Chennai, Tamil Nadu",1464,247,5.58,16.87,122.99
+IXC,PNQ,IXC-PNQ,"Chandigarh, Chandigarh","Pune, Maharashtra",575,97,5.47,16.87,107.22
+PNQ,VTZ,PNQ-VTZ,"Pune, Maharashtra","Visakhapatnam, Andhra Pradesh",427,72,4.33,16.86,102.17
+VNS,CCU,VNS-CCU,"Varanasi, Uttar Pradesh","Kolkata, West Bengal",866,146,6.08,16.86,114.05
+PAT,HYD,PAT-HYD,"Patna, Bihar","Hyderabad, Telangana",1456,245,5.22,16.83,122.57
+IDR,GOI,IDR-GOI,"Indore, Madhya Pradesh","Goa (Dabolim), Goa",440,74,4.74,16.82,102.41
+LKO,VNS,LKO-VNS,"Lucknow, Uttar Pradesh","Varanasi, Uttar Pradesh",470,79,4.85,16.81,103.45
+IXE,BOM,IXE-BOM,"Mangaluru, Karnataka","Mumbai, Maharashtra",1054,177,4.61,16.79,116.90
+AMD,GOX,AMD-GOX,"Ahmedabad, Gujarat","Goa (Mopa), Goa",1102,185,4.07,16.79,117.61
+BLR,GAU,BLR-GAU,"Bengaluru, Karnataka","Guwahati, Assam",2658,446,4.09,16.78,132.32
+BLR,HYD,BLR-HYD,"Bengaluru, Karnataka","Hyderabad, Telangana",13786,2313,4.33,16.78,159.92
+IXB,HYD,IXB-HYD,"Bagdogra, West Bengal","Hyderabad, Telangana",1152,193,4.60,16.75,118.11
+VNS,DEL,VNS-DEL,"Varanasi, Uttar Pradesh","Delhi, Delhi",3480,583,5.38,16.75,136.62
+MAA,CCU,MAA-CCU,"Chennai, Tamil Nadu","Kolkata, West Bengal",3683,617,4.47,16.75,137.57
+BHO,PNQ,BHO-PNQ,"Bhopal, Madhya Pradesh","Pune, Maharashtra",406,68,4.62,16.75,100.64
+COK,GOI,COK-GOI,"Kochi, Kerala","Goa (Dabolim), Goa",670,112,5.14,16.72,108.80
+GOX,BLR,GOX-BLR,"Goa (Mopa), Goa","Bengaluru, Karnataka",2172,363,5.00,16.71,128.42
+JAI,GAU,JAI-GAU,"Jaipur, Rajasthan","Guwahati, Assam",479,80,4.42,16.70,103.11
+IDR,BOM,IDR-BOM,"Indore, Madhya Pradesh","Mumbai, Maharashtra",3196,533,5.33,16.68,134.58
+HYD,BHO,HYD-BHO,"Hyderabad, Telangana","Bhopal, Madhya Pradesh",660,110,4.45,16.67,108.23
+DED,HYD,DED-HYD,"Dehradun, Uttarakhand","Hyderabad, Telangana",624,104,4.81,16.67,107.30
+HYD,PAT,HYD-PAT,"Hyderabad, Telangana","Patna, Bihar",1483,247,6.22,16.66,121.63
+ATQ,MAA,ATQ-MAA,"Amritsar, Punjab","Chennai, Tamil Nadu",638,106,4.96,16.61,107.33
+GOX,PNQ,GOX-PNQ,"Goa (Mopa), Goa","Pune, Maharashtra",951,158,5.90,16.61,113.95
+DED,BLR,DED-BLR,"Dehradun, Uttarakhand","Bengaluru, Karnataka",921,153,5.38,16.61,113.41
+IXJ,HYD,IXJ-HYD,"Jammu, Jammu and Kashmir","Hyderabad, Telangana",596,99,4.37,16.61,106.17
+AMD,JAI,AMD-JAI,"Ahmedabad, Gujarat","Jaipur, Rajasthan",862,143,5.66,16.59,112.15
+BDQ,PNQ,BDQ-PNQ,"Vadodara, Gujarat","Pune, Maharashtra",422,70,3.80,16.59,100.31
+NAG,CCU,NAG-CCU,"Nagpur, Maharashtra","Kolkata, West Bengal",832,138,3.74,16.59,111.55
+ATQ,COK,ATQ-COK,"Amritsar, Punjab","Kochi, Kerala",392,65,5.90,16.58,99.06
+PAT,BBI,PAT-BBI,"Patna, Bihar","Bhubaneswar, Odisha",495,82,4.52,16.57,102.82
+NAG,COK,NAG-COK,"Nagpur, Maharashtra","Kochi, Kerala",574,95,3.67,16.55,105.17
+TRV,BLR,TRV-BLR,"Thiruvananthapuram, Kerala","Bengaluru, Karnataka",2504,414,4.39,16.53,129.39
+STV,HYD,STV-HYD,"Surat, Gujarat","Hyderabad, Telangana",460,76,3.74,16.52,101.33
+PNQ,GOI,PNQ-GOI,"Pune, Maharashtra","Goa (Dabolim), Goa",902,149,5.65,16.52,112.42
+IDR,MAA,IDR-MAA,"Indore, Madhya Pradesh","Chennai, Tamil Nadu",1036,171,4.66,16.51,114.62
+CCU,TRV,CCU-TRV,"Kolkata, West Bengal","Thiruvananthapuram, Kerala",788,130,5.46,16.50,110.05
+COK,PAT,COK-PAT,"Kochi, Kerala","Patna, Bihar",679,112,5.38,16.49,107.58
+NAG,PNQ,NAG-PNQ,"Nagpur, Maharashtra","Pune, Maharashtra",772,127,3.71,16.45,109.40
+GAU,LKO,GAU-LKO,"Guwahati, Assam","Lucknow, Uttar Pradesh",505,83,4.91,16.44,102.34
+BHO,BOM,BHO-BOM,"Bhopal, Madhya Pradesh","Mumbai, Maharashtra",1552,255,5.14,16.43,120.73
+IXZ,MAA,IXZ-MAA,"Port Blair, Andaman and Nicobar","Chennai, Tamil Nadu",493,81,4.94,16.43,101.91
+MAA,BLR,MAA-BLR,"Chennai, Tamil Nadu","Bengaluru, Karnataka",11249,1848,4.71,16.43,153.24
+CCU,DED,CCU-DED,"Kolkata, West Bengal","Dehradun, Uttarakhand",487,80,3.74,16.43,101.69
+BBI,PAT,BBI-PAT,"Bhubaneswar, Odisha","Patna, Bihar",481,79,5.71,16.42,101.47
+GOX,NAG,GOX-NAG,"Goa (Mopa), Goa","Nagpur, Maharashtra",384,63,5.64,16.41,97.67
+GOX,JAI,GOX-JAI,"Goa (Mopa), Goa","Jaipur, Rajasthan",439,72,6.32,16.40,99.83
+VNS,BLR,VNS-BLR,"Varanasi, Uttar Pradesh","Bengaluru, Karnataka",1689,277,4.86,16.40,121.89
+LKO,GOX,LKO-GOX,"Lucknow, Uttar Pradesh","Goa (Mopa), Goa",397,65,6.45,16.37,98.01
+LKO,IDR,LKO-IDR,"Lucknow, Uttar Pradesh","Indore, Madhya Pradesh",385,63,3.39,16.36,97.46
+SXR,PNQ,SXR-PNQ,"Srinagar, Jammu and Kashmir","Pune, Maharashtra",532,87,5.92,16.35,102.68
+GAU,PNQ,GAU-PNQ,"Guwahati, Assam","Pune, Maharashtra",740,121,5.69,16.35,108.05
+VNS,MAA,VNS-MAA,"Varanasi, Uttar Pradesh","Chennai, Tamil Nadu",900,147,3.63,16.33,111.12
+RPR,PNQ,RPR-PNQ,"Raipur, Chhattisgarh","Pune, Maharashtra",337,55,3.78,16.32,95.03
+IDR,CCU,IDR-CCU,"Indore, Madhya Pradesh","Kolkata, West Bengal",952,155,4.50,16.28,111.68
+GAU,SXR,GAU-SXR,"Guwahati, Assam","Srinagar, Jammu and Kashmir",387,63,3.98,16.28,97.04
+IXB,COK,IXB-COK,"Bagdogra, West Bengal","Kochi, Kerala",535,87,4.72,16.26,102.19
+COK,GOX,COK-GOX,"Kochi, Kerala","Goa (Mopa), Goa",615,100,5.27,16.26,104.44
+GOI,IDR,GOI-IDR,"Goa (Dabolim), Goa","Indore, Madhya Pradesh",449,73,4.57,16.26,99.33
+HYD,BBI,HYD-BBI,"Hyderabad, Telangana","Bhubaneswar, Odisha",1448,235,3.42,16.23,118.13
+HYD,GOI,HYD-GOI,"Hyderabad, Telangana","Goa (Dabolim), Goa",1531,248,4.99,16.20,118.81
+BLR,UDR,BLR-UDR,"Bengaluru, Karnataka","Udaipur, Rajasthan",920,149,4.65,16.20,110.54
+IXC,JAI,IXC-JAI,"Chandigarh, Chandigarh","Jaipur, Rajasthan",544,88,5.07,16.18,101.92
+AMD,BLR,AMD-BLR,"Ahmedabad, Gujarat","Bengaluru, Karnataka",4693,759,3.86,16.17,136.73
+BBI,PNQ,BBI-PNQ,"Bhubaneswar, Odisha","Pune, Maharashtra",637,103,3.47,16.17,104.43
+PAT,BLR,PAT-BLR,"Patna, Bihar","Bengaluru, Karnataka",2124,343,4.33,16.15,123.72
+AMD,IXR,AMD-IXR,"Ahmedabad, Gujarat","Ranchi, Jharkhand",397,64,4.90,16.12,96.51
+VTZ,COK,VTZ-COK,"Visakhapatnam, Andhra Pradesh","Kochi, Kerala",633,102,4.47,16.11,103.97
+BBI,AMD,BBI-AMD,"Bhubaneswar, Odisha","Ahmedabad, Gujarat",720,116,4.44,16.11,106.02
+NAG,GOX,NAG-GOX,"Nagpur, Maharashtra","Goa (Mopa), Goa",385,62,4.25,16.10,95.91
+PNQ,CCU,PNQ-CCU,"Pune, Maharashtra","Kolkata, West Bengal",1821,293,4.32,16.09,120.80
+AMD,IDR,AMD-IDR,"Ahmedabad, Gujarat","Indore, Madhya Pradesh",989,159,4.45,16.08,110.89
+HYD,UDR,HYD-UDR,"Hyderabad, Telangana","Udaipur, Rajasthan",629,101,4.27,16.06,103.50
+PNQ,NAG,PNQ-NAG,"Pune, Maharashtra","Nagpur, Maharashtra",710,114,4.51,16.06,105.44
+HYD,IXE,HYD-IXE,"Hyderabad, Telangana","Mangaluru, Karnataka",980,157,3.97,16.02,110.36
+IXC,HYD,IXC-HYD,"Chandigarh, Chandigarh","Hyderabad, Telangana",1281,205,4.82,16.00,114.52
+MAA,IXM,MAA-IXM,"Chennai, Tamil Nadu","Madurai, Tamil Nadu",520,83,4.69,15.96,99.85
+HYD,HBX,HYD-HBX,"Hyderabad, Telangana","Hubballi, Karnataka",495,79,3.62,15.96,99.05
+HYD,TRZ,HYD-TRZ,"Hyderabad, Telangana","Tiruchirappalli, Tamil Nadu",721,115,5.13,15.95,104.98
+VTZ,MAA,VTZ-MAA,"Visakhapatnam, Andhra Pradesh","Chennai, Tamil Nadu",1098,175,4.03,15.94,111.60
+CCU,COK,CCU-COK,"Kolkata, West Bengal","Kochi, Kerala",2059,328,4.29,15.93,121.55
+GOI,CCU,GOI-CCU,"Goa (Dabolim), Goa","Kolkata, West Bengal",1036,165,4.61,15.93,110.60
+MAA,RPR,MAA-RPR,"Chennai, Tamil Nadu","Raipur, Chhattisgarh",691,110,5.09,15.92,104.10
+NAG,BOM,NAG-BOM,"Nagpur, Maharashtra","Mumbai, Maharashtra",2795,444,5.13,15.89,126.07
+BLR,TRV,BLR-TRV,"Bengaluru, Karnataka","Thiruvananthapuram, Kerala",2506,398,4.50,15.88,124.30
+BLR,IMF,BLR-IMF,"Bengaluru, Karnataka","Imphal, Manipur",920,146,3.80,15.87,108.32
+JAI,MAA,JAI-MAA,"Jaipur, Rajasthan","Chennai, Tamil Nadu",1431,227,4.47,15.86,115.27
+GOX,COK,GOX-COK,"Goa (Mopa), Goa","Kochi, Kerala",694,110,5.00,15.85,103.72
+GOX,CCU,GOX-CCU,"Goa (Mopa), Goa","Kolkata, West Bengal",1016,161,4.59,15.85,109.73
+AMD,VTZ,AMD-VTZ,"Ahmedabad, Gujarat","Visakhapatnam, Andhra Pradesh",486,77,3.33,15.84,98.04
+DIB,HYD,DIB-HYD,"Dibrugarh, Assam","Hyderabad, Telangana",322,51,4.88,15.84,91.51
+IMF,MAA,IMF-MAA,"Imphal, Manipur","Chennai, Tamil Nadu",512,81,4.38,15.82,98.72
+TRZ,BLR,TRZ-BLR,"Tiruchirappalli, Tamil Nadu","Bengaluru, Karnataka",961,152,4.21,15.82,108.65
+LKO,PAT,LKO-PAT,"Lucknow, Uttar Pradesh","Patna, Bihar",392,62,4.35,15.82,94.48
+RPR,CCU,RPR-CCU,"Raipur, Chhattisgarh","Kolkata, West Bengal",860,136,3.89,15.81,106.87
+CCU,ATQ,CCU-ATQ,"Kolkata, West Bengal","Amritsar, Punjab",545,86,4.10,15.78,99.45
+HYD,AMD,HYD-AMD,"Hyderabad, Telangana","Ahmedabad, Gujarat",3226,509,4.24,15.78,127.48
+IDR,LKO,IDR-LKO,"Indore, Madhya Pradesh","Lucknow, Uttar Pradesh",393,62,2.76,15.78,94.28
+TRV,CCU,TRV-CCU,"Thiruvananthapuram, Kerala","Kolkata, West Bengal",767,121,4.56,15.78,104.81
+CCU,BHO,CCU-BHO,"Kolkata, West Bengal","Bhopal, Madhya Pradesh",425,67,5.24,15.76,95.45
+CCU,BLR,CCU-BLR,"Kolkata, West Bengal","Bengaluru, Karnataka",6789,1068,3.95,15.73,138.80
+IXM,BLR,IXM-BLR,"Madurai, Tamil Nadu","Bengaluru, Karnataka",960,151,3.70,15.73,108.03
+HYD,BLR,HYD-BLR,"Hyderabad, Telangana","Bengaluru, Karnataka",14186,2231,3.82,15.73,150.35
+STV,DEL,STV-DEL,"Surat, Gujarat","Delhi, Delhi",916,144,5.10,15.72,107.23
+IMF,HYD,IMF-HYD,"Imphal, Manipur","Hyderabad, Telangana",637,100,4.06,15.70,101.39
+SXR,JAI,SXR-JAI,"Srinagar, Jammu and Kashmir","Jaipur, Rajasthan",580,91,3.43,15.69,99.86
+IDR,BLR,IDR-BLR,"Indore, Madhya Pradesh","Bengaluru, Karnataka",1893,297,4.00,15.69,118.40
+HYD,STV,HYD-STV,"Hyderabad, Telangana","Surat, Gujarat",472,74,4.01,15.68,96.56
+BDQ,BOM,BDQ-BOM,"Vadodara, Gujarat","Mumbai, Maharashtra",1544,242,4.25,15.67,115.09
+MAA,UDR,MAA-UDR,"Chennai, Tamil Nadu","Udaipur, Rajasthan",536,84,3.01,15.67,98.51
+GAU,GOX,GAU-GOX,"Guwahati, Assam","Goa (Mopa), Goa",383,60,5.25,15.67,93.22
+HYD,DED,HYD-DED,"Hyderabad, Telangana","Dehradun, Uttarakhand",588,92,5.04,15.65,99.80
+PNQ,IDR,PNQ-IDR,"Pune, Maharashtra","Indore, Madhya Pradesh",774,121,4.60,15.63,104.00
+TRV,HYD,TRV-HYD,"Thiruvananthapuram, Kerala","Hyderabad, Telangana",1740,272,4.43,15.63,116.65
+VTZ,HYD,VTZ-HYD,"Visakhapatnam, Andhra Pradesh","Hyderabad, Telangana",1499,234,3.34,15.61,114.16
+AMD,TRV,AMD-TRV,"Ahmedabad, Gujarat","Thiruvananthapuram, Kerala",590,92,3.81,15.59,99.51
+LKO,SXR,LKO-SXR,"Lucknow, Uttar Pradesh","Srinagar, Jammu and Kashmir",603,94,4.17,15.59,99.82
+BLR,AMD,BLR-AMD,"Bengaluru, Karnataka","Ahmedabad, Gujarat",4513,703,3.52,15.58,131.08
+NAG,GOI,NAG-GOI,"Nagpur, Maharashtra","Goa (Dabolim), Goa",392,61,3.30,15.56,92.96
+LKO,CCU,LKO-CCU,"Lucknow, Uttar Pradesh","Kolkata, West Bengal",1319,205,4.55,15.54,111.68
+PAT,LKO,PAT-LKO,"Patna, Bihar","Lucknow, Uttar Pradesh",425,66,5.87,15.53,94.02
+MAA,AMD,MAA-AMD,"Chennai, Tamil Nadu","Ahmedabad, Gujarat",2538,394,4.67,15.52,121.70
+IXZ,HYD,IXZ-HYD,"Port Blair, Andaman and Nicobar","Hyderabad, Telangana",600,93,3.08,15.50,99.18
+CCU,GOX,CCU-GOX,"Kolkata, West Bengal","Goa (Mopa), Goa",1014,157,3.94,15.48,107.18
+HYD,DIB,HYD-DIB,"Hyderabad, Telangana","Dibrugarh, Assam",350,54,2.63,15.43,90.42
+CCU,IXB,CCU-IXB,"Kolkata, West Bengal","Bagdogra, West Bengal",1222,188,4.29,15.38,109.37
+IXB,MAA,IXB-MAA,"Bagdogra, West Bengal","Chennai, Tamil Nadu",988,152,3.53,15.38,106.10
+BLR,HBX,BLR-HBX,"Bengaluru, Karnataka","Hubballi, Karnataka",761,117,4.28,15.37,102.02
+SXR,IXC,SXR-IXC,"Srinagar, Jammu and Kashmir","Chandigarh, Chandigarh",397,61,3.40,15.37,91.98
+NAG,AMD,NAG-AMD,"Nagpur, Maharashtra","Ahmedabad, Gujarat",892,137,2.91,15.36,104.36
+GOX,BOM,GOX-BOM,"Goa (Mopa), Goa","Mumbai, Maharashtra",3536,543,4.16,15.36,125.48
+BBI,LKO,BBI-LKO,"Bhubaneswar, Odisha","Lucknow, Uttar Pradesh",443,68,3.93,15.35,93.57
+AMD,CCJ,AMD-CCJ,"Ahmedabad, Gujarat","Kozhikode, Kerala",417,64,4.35,15.35,92.63
+SXR,CCU,SXR-CCU,"Srinagar, Jammu and Kashmir","Kolkata, West Bengal",997,153,4.51,15.35,105.98
+GOX,AMD,GOX-AMD,"Goa (Mopa), Goa","Ahmedabad, Gujarat",1115,171,3.45,15.34,107.62
+HYD,GAU,HYD-GAU,"Hyderabad, Telangana","Guwahati, Assam",1696,260,3.68,15.33,114.00
+MAA,GOX,MAA-GOX,"Chennai, Tamil Nadu","Goa (Mopa), Goa",1150,176,3.99,15.30,107.87
+PNQ,GOX,PNQ-GOX,"Pune, Maharashtra","Goa (Mopa), Goa",935,143,4.59,15.29,104.64
+VTZ,BLR,VTZ-BLR,"Visakhapatnam, Andhra Pradesh","Bengaluru, Karnataka",2093,320,3.89,15.29,116.91
+GAU,PAT,GAU-PAT,"Guwahati, Assam","Patna, Bihar",628,96,5.98,15.29,98.51
+AMD,NAG,AMD-NAG,"Ahmedabad, Gujarat","Nagpur, Maharashtra",891,136,2.95,15.26,103.69
+UDR,BLR,UDR-BLR,"Udaipur, Rajasthan","Bengaluru, Karnataka",931,142,3.95,15.25,104.29
+DIB,CCU,DIB-CCU,"Dibrugarh, Assam","Kolkata, West Bengal",361,55,3.05,15.24,89.76
+BDQ,BLR,BDQ-BLR,"Vadodara, Gujarat","Bengaluru, Karnataka",939,143,3.78,15.23,104.26
+HYD,LKO,HYD-LKO,"Hyderabad, Telangana","Lucknow, Uttar Pradesh",1819,277,4.46,15.23,114.31
+CCU,RPR,CCU-RPR,"Kolkata, West Bengal","Raipur, Chhattisgarh",874,133,3.61,15.22,103.09
+CJB,HYD,CJB-HYD,"Coimbatore, Tamil Nadu","Hyderabad, Telangana",1170,178,4.37,15.21,107.49
+BOM,VTZ,BOM-VTZ,"Mumbai, Maharashtra","Visakhapatnam, Andhra Pradesh",1553,236,4.12,15.20,111.67
+AMD,BBI,AMD-BBI,"Ahmedabad, Gujarat","Bhubaneswar, Odisha",744,113,3.53,15.19,100.45
+GOX,PAT,GOX-PAT,"Goa (Mopa), Goa","Patna, Bihar",349,53,4.68,15.19,88.96
+BHO,MAA,BHO-MAA,"Bhopal, Madhya Pradesh","Chennai, Tamil Nadu",560,85,2.93,15.18,96.08
+MAA,STV,MAA-STV,"Chennai, Tamil Nadu","Surat, Gujarat",369,56,2.66,15.18,89.74
+PAT,CCU,PAT-CCU,"Patna, Bihar","Kolkata, West Bengal",1582,240,3.68,15.17,111.76
+IXJ,CCU,IXJ-CCU,"Jammu, Jammu and Kashmir","Kolkata, West Bengal",455,69,4.08,15.16,92.85
+HYD,CCU,HYD-CCU,"Hyderabad, Telangana","Kolkata, West Bengal",4426,671,3.35,15.16,127.28
+IDR,HYD,IDR-HYD,"Indore, Madhya Pradesh","Hyderabad, Telangana",1307,198,3.13,15.15,108.71
+BBI,HYD,BBI-HYD,"Bhubaneswar, Odisha","Hyderabad, Telangana",1536,232,3.44,15.10,110.83
+BLR,IXB,BLR-IXB,"Bengaluru, Karnataka","Bagdogra, West Bengal",1682,254,3.13,15.10,112.18
+MAA,CJB,MAA-CJB,"Chennai, Tamil Nadu","Coimbatore, Tamil Nadu",1021,154,3.64,15.08,104.52
+AMD,HYD,AMD-HYD,"Ahmedabad, Gujarat","Hyderabad, Telangana",3164,477,3.28,15.08,121.51
+MAA,HBX,MAA-HBX,"Chennai, Tamil Nadu","Hubballi, Karnataka",418,63,3.01,15.07,91.00
+BLR,IXZ,BLR-IXZ,"Bengaluru, Karnataka","Port Blair, Andaman and Nicobar",865,130,3.99,15.03,101.65
+IDR,AMD,IDR-AMD,"Indore, Madhya Pradesh","Ahmedabad, Gujarat",994,149,3.21,14.99,103.47
+BDQ,HYD,BDQ-HYD,"Vadodara, Gujarat","Hyderabad, Telangana",594,89,3.69,14.98,95.72
+IXB,BLR,IXB-BLR,"Bagdogra, West Bengal","Bengaluru, Karnataka",1636,245,3.74,14.98,110.83
+LKO,BBI,LKO-BBI,"Lucknow, Uttar Pradesh","Bhubaneswar, Odisha",441,66,3.15,14.97,91.16
+VTZ,AMD,VTZ-AMD,"Visakhapatnam, Andhra Pradesh","Ahmedabad, Gujarat",488,73,3.55,14.96,92.63
+LKO,AMD,LKO-AMD,"Lucknow, Uttar Pradesh","Ahmedabad, Gujarat",849,127,4.03,14.96,100.90
+VTZ,CCU,VTZ-CCU,"Visakhapatnam, Andhra Pradesh","Kolkata, West Bengal",749,112,4.03,14.95,98.99
+GOX,LKO,GOX-LKO,"Goa (Mopa), Goa","Lucknow, Uttar Pradesh",428,64,4.91,14.95,90.64
+TRV,PNQ,TRV-PNQ,"Thiruvananthapuram, Kerala","Pune, Maharashtra",462,69,4.32,14.94,91.67
+HYD,IXB,HYD-IXB,"Hyderabad, Telangana","Bagdogra, West Bengal",1159,173,3.41,14.93,105.33
+CCU,CJB,CCU-CJB,"Kolkata, West Bengal","Coimbatore, Tamil Nadu",617,92,3.63,14.91,95.82
+JAI,IDR,JAI-IDR,"Jaipur, Rajasthan","Indore, Madhya Pradesh",369,55,4.01,14.91,88.14
+MAA,GAU,MAA-GAU,"Chennai, Tamil Nadu","Guwahati, Assam",1450,216,3.79,14.90,108.45
+VNS,SXR,VNS-SXR,"Varanasi, Uttar Pradesh","Srinagar, Jammu and Kashmir",356,53,6.02,14.89,87.51
+MAA,BDQ,MAA-BDQ,"Chennai, Tamil Nadu","Vadodara, Gujarat",484,72,3.83,14.88,92.00
+CCU,JAI,CCU-JAI,"Kolkata, West Bengal","Jaipur, Rajasthan",1218,181,4.30,14.86,105.60
+CCU,HYD,CCU-HYD,"Kolkata, West Bengal","Hyderabad, Telangana",4528,672,3.14,14.84,124.94
+GAU,HYD,GAU-HYD,"Guwahati, Assam","Hyderabad, Telangana",1705,253,3.70,14.84,110.43
+PNQ,IXB,PNQ-IXB,"Pune, Maharashtra","Bagdogra, West Bengal",479,71,2.99,14.82,91.51
+BLR,GOX,BLR-GOX,"Bengaluru, Karnataka","Goa (Mopa), Goa",2147,318,3.86,14.81,113.64
+CCU,AMD,CCU-AMD,"Kolkata, West Bengal","Ahmedabad, Gujarat",2358,349,2.86,14.80,114.94
+CJB,AMD,CJB-AMD,"Coimbatore, Tamil Nadu","Ahmedabad, Gujarat",426,63,3.53,14.79,89.57
+IXB,CCU,IXB-CCU,"Bagdogra, West Bengal","Kolkata, West Bengal",1177,174,3.65,14.78,104.54
+HYD,IXM,HYD-IXM,"Hyderabad, Telangana","Madurai, Tamil Nadu",670,99,4.32,14.78,96.17
+HYD,NAG,HYD-NAG,"Hyderabad, Telangana","Nagpur, Maharashtra",1165,172,3.25,14.76,104.25
+CCU,BDQ,CCU-BDQ,"Kolkata, West Bengal","Vadodara, Gujarat",461,68,2.85,14.75,90.50
+GOI,BLR,GOI-BLR,"Goa (Dabolim), Goa","Bengaluru, Karnataka",2034,300,3.30,14.75,112.36
+NAG,HYD,NAG-HYD,"Nagpur, Maharashtra","Hyderabad, Telangana",1106,163,2.98,14.74,103.30
+IDR,NAG,IDR-NAG,"Indore, Madhya Pradesh","Nagpur, Maharashtra",367,54,2.29,14.71,86.93
+CCU,VTZ,CCU-VTZ,"Kolkata, West Bengal","Visakhapatnam, Andhra Pradesh",714,105,3.34,14.71,96.65
+BDQ,MAA,BDQ-MAA,"Vadodara, Gujarat","Chennai, Tamil Nadu",494,72,2.40,14.57,90.43
+VNS,JAI,VNS-JAI,"Varanasi, Uttar Pradesh","Jaipur, Rajasthan",446,65,4.42,14.57,88.94
+BHO,BLR,BHO-BLR,"Bhopal, Madhya Pradesh","Bengaluru, Karnataka",906,132,2.90,14.57,99.22
+STV,MAA,STV-MAA,"Surat, Gujarat","Chennai, Tamil Nadu",371,54,4.86,14.56,86.15
+IXE,CCU,IXE-CCU,"Mangaluru, Karnataka","Kolkata, West Bengal",434,63,4.78,14.52,88.19
+SXR,VNS,SXR-VNS,"Srinagar, Jammu and Kashmir","Varanasi, Uttar Pradesh",379,55,5.04,14.51,86.20
+VTZ,PNQ,VTZ-PNQ,"Visakhapatnam, Andhra Pradesh","Pune, Maharashtra",400,58,5.08,14.50,86.91
+JAI,BLR,JAI-BLR,"Jaipur, Rajasthan","Bengaluru, Karnataka",2585,374,4.13,14.47,113.69
+VNS,AMD,VNS-AMD,"Varanasi, Uttar Pradesh","Ahmedabad, Gujarat",553,80,2.98,14.47,91.39
+CCU,IMF,CCU-IMF,"Kolkata, West Bengal","Imphal, Manipur",650,94,3.84,14.46,93.69
+MAA,IXZ,MAA-IXZ,"Chennai, Tamil Nadu","Port Blair, Andaman and Nicobar",491,71,3.46,14.46,89.63
+GAU,AMD,GAU-AMD,"Guwahati, Assam","Ahmedabad, Gujarat",906,131,2.98,14.46,98.47
+UDR,CCU,UDR-CCU,"Udaipur, Rajasthan","Kolkata, West Bengal",422,61,3.27,14.45,87.41
+BLR,RPR,BLR-RPR,"Bengaluru, Karnataka","Raipur, Chhattisgarh",1156,167,3.04,14.45,101.90
+HYD,BDQ,HYD-BDQ,"Hyderabad, Telangana","Vadodara, Gujarat",651,94,2.77,14.44,93.57
+AMD,CCU,AMD-CCU,"Ahmedabad, Gujarat","Kolkata, West Bengal",2300,332,2.91,14.43,111.74
+GAU,JAI,GAU-JAI,"Guwahati, Assam","Jaipur, Rajasthan",499,72,4.46,14.43,89.67
+BLR,VTZ,BLR-VTZ,"Bengaluru, Karnataka","Visakhapatnam, Andhra Pradesh",2100,303,3.00,14.43,110.38
+GAU,MAA,GAU-MAA,"Guwahati, Assam","Chennai, Tamil Nadu",1442,208,3.23,14.42,104.93
+STV,AMD,STV-AMD,"Surat, Gujarat","Ahmedabad, Gujarat",341,49,2.40,14.37,83.84
+IDR,COK,IDR-COK,"Indore, Madhya Pradesh","Kochi, Kerala",586,84,4.47,14.33,91.38
+PNQ,BDQ,PNQ-BDQ,"Pune, Maharashtra","Vadodara, Gujarat",398,57,3.80,14.32,85.77
+HYD,RPR,HYD-RPR,"Hyderabad, Telangana","Raipur, Chhattisgarh",812,116,3.22,14.29,95.72
+PAT,AMD,PAT-AMD,"Patna, Bihar","Ahmedabad, Gujarat",721,103,3.47,14.29,94.03
+PNQ,TRV,PNQ-TRV,"Pune, Maharashtra","Thiruvananthapuram, Kerala",483,69,4.36,14.29,88.32
+GOI,LKO,GOI-LKO,"Goa (Dabolim), Goa","Lucknow, Uttar Pradesh",420,60,3.37,14.29,86.32
+IXC,VNS,IXC-VNS,"Chandigarh, Chandigarh","Varanasi, Uttar Pradesh",343,49,2.34,14.29,83.44
+CCU,UDR,CCU-UDR,"Kolkata, West Bengal","Udaipur, Rajasthan",484,69,2.87,14.26,88.16
+IXC,LKO,IXC-LKO,"Chandigarh, Chandigarh","Lucknow, Uttar Pradesh",534,76,2.38,14.23,89.41
+AMD,BHO,AMD-BHO,"Ahmedabad, Gujarat","Bhopal, Madhya Pradesh",485,69,3.10,14.23,88.01
+HYD,IDR,HYD-IDR,"Hyderabad, Telangana","Indore, Madhya Pradesh",1316,187,3.50,14.21,102.07
+JAI,CCU,JAI-CCU,"Jaipur, Rajasthan","Kolkata, West Bengal",1232,175,3.63,14.20,101.10
+GOI,COK,GOI-COK,"Goa (Dabolim), Goa","Kochi, Kerala",697,99,3.29,14.20,93.01
+IMF,CCU,IMF-CCU,"Imphal, Manipur","Kolkata, West Bengal",691,98,2.80,14.18,92.75
+BOM,BBI,BOM-BBI,"Mumbai, Maharashtra","Bhubaneswar, Odisha",2294,325,3.28,14.17,109.63
+BBI,JAI,BBI-JAI,"Bhubaneswar, Odisha","Jaipur, Rajasthan",466,66,3.80,14.16,87.05
+GAU,BOM,GAU-BOM,"Guwahati, Assam","Mumbai, Maharashtra",2954,418,3.21,14.15,113.08
+GOI,JAI,GOI-JAI,"Goa (Dabolim), Goa","Jaipur, Rajasthan",417,59,5.66,14.15,85.39
+GAU,BLR,GAU-BLR,"Guwahati, Assam","Bengaluru, Karnataka",2527,357,2.65,14.13,110.69
+RPR,AMD,RPR-AMD,"Raipur, Chhattisgarh","Ahmedabad, Gujarat",433,61,1.64,14.09,85.56
+BOM,IXE,BOM-IXE,"Mumbai, Maharashtra","Mangaluru, Karnataka",1066,150,3.51,14.07,98.11
+CCU,IXE,CCU-IXE,"Kolkata, West Bengal","Mangaluru, Karnataka",462,65,2.76,14.07,86.35
+SXR,GAU,SXR-GAU,"Srinagar, Jammu and Kashmir","Guwahati, Assam",357,50,3.71,14.01,82.36
+GOX,HYD,GOX-HYD,"Goa (Mopa), Goa","Hyderabad, Telangana",1443,202,3.88,14.00,101.84
+JAI,PAT,JAI-PAT,"Jaipur, Rajasthan","Patna, Bihar",394,55,3.89,13.96,83.46
+STV,BLR,STV-BLR,"Surat, Gujarat","Bengaluru, Karnataka",645,90,3.52,13.95,90.29
+JAI,HYD,JAI-HYD,"Jaipur, Rajasthan","Hyderabad, Telangana",1739,242,3.66,13.92,103.84
+HBX,BLR,HBX-BLR,"Hubballi, Karnataka","Bengaluru, Karnataka",734,102,2.95,13.90,91.71
+GAU,GOI,GAU-GOI,"Guwahati, Assam","Goa (Dabolim), Goa",360,50,3.60,13.89,81.79
+LKO,JAI,LKO-JAI,"Lucknow, Uttar Pradesh","Jaipur, Rajasthan",749,104,3.62,13.89,91.92
+IXB,PNQ,IXB-PNQ,"Bagdogra, West Bengal","Pune, Maharashtra",497,69,2.50,13.88,86.22
+PNQ,BBI,PNQ-BBI,"Pune, Maharashtra","Bhubaneswar, Odisha",592,82,3.22,13.85,88.44
+BDQ,CCU,BDQ-CCU,"Vadodara, Gujarat","Kolkata, West Bengal",465,64,2.46,13.76,84.57
+PAT,JAI,PAT-JAI,"Patna, Bihar","Jaipur, Rajasthan",422,58,4.58,13.74,83.12
+CJB,BLR,CJB-BLR,"Coimbatore, Tamil Nadu","Bengaluru, Karnataka",1785,245,3.10,13.73,102.77
+PAT,GAU,PAT-GAU,"Patna, Bihar","Guwahati, Assam",612,84,3.96,13.73,88.10
+GAU,IXB,GAU-IXB,"Guwahati, Assam","Bagdogra, West Bengal",481,66,3.98,13.72,84.77
+BOM,DIB,BOM-DIB,"Mumbai, Maharashtra","Dibrugarh, Assam",605,83,3.62,13.72,87.90
+CCU,GOI,CCU-GOI,"Kolkata, West Bengal","Goa (Dabolim), Goa",994,136,2.20,13.68,94.44
+IDR,GAU,IDR-GAU,"Indore, Madhya Pradesh","Guwahati, Assam",417,57,2.47,13.67,82.50
+JAI,LKO,JAI-LKO,"Jaipur, Rajasthan","Lucknow, Uttar Pradesh",696,95,4.04,13.65,89.36
+BBI,CCU,BBI-CCU,"Bhubaneswar, Odisha","Kolkata, West Bengal",1585,216,2.55,13.63,100.42
+BDQ,AMD,BDQ-AMD,"Vadodara, Gujarat","Ahmedabad, Gujarat",492,67,2.26,13.62,84.44
+IXZ,CCU,IXZ-CCU,"Port Blair, Andaman and Nicobar","Kolkata, West Bengal",661,90,3.33,13.62,88.44
+AMD,STV,AMD-STV,"Ahmedabad, Gujarat","Surat, Gujarat",331,45,2.47,13.60,78.92
+LKO,GAU,LKO-GAU,"Lucknow, Uttar Pradesh","Guwahati, Assam",534,72,3.66,13.48,84.70
+HYD,IMF,HYD-IMF,"Hyderabad, Telangana","Imphal, Manipur",641,86,2.72,13.42,86.73
+GOI,GAU,GOI-GAU,"Goa (Dabolim), Goa","Guwahati, Assam",403,54,3.40,13.40,80.42
+CCU,NAG,CCU-NAG,"Kolkata, West Bengal","Nagpur, Maharashtra",799,107,1.25,13.39,89.52
+JAI,COK,JAI-COK,"Jaipur, Rajasthan","Kochi, Kerala",799,107,3.16,13.39,89.52
+VNS,LKO,VNS-LKO,"Varanasi, Uttar Pradesh","Lucknow, Uttar Pradesh",493,66,3.79,13.39,83.04
+BBI,BLR,BBI-BLR,"Bhubaneswar, Odisha","Bengaluru, Karnataka",2197,294,2.64,13.38,102.98
+BLR,IDR,BLR-IDR,"Bengaluru, Karnataka","Indore, Madhya Pradesh",1855,248,2.55,13.37,100.62
+AMD,CJB,AMD-CJB,"Ahmedabad, Gujarat","Coimbatore, Tamil Nadu",419,56,2.12,13.37,80.73
+HYD,VTZ,HYD-VTZ,"Hyderabad, Telangana","Visakhapatnam, Andhra Pradesh",1523,203,2.99,13.33,97.69
+DIB,BLR,DIB-BLR,"Dibrugarh, Assam","Bengaluru, Karnataka",526,70,3.04,13.31,83.40
+IMF,BLR,IMF-BLR,"Imphal, Manipur","Bengaluru, Karnataka",903,120,2.19,13.29,90.46
+GOI,GOX,GOI-GOX,"Goa (Dabolim), Goa","Goa (Mopa), Goa",497,66,2.54,13.28,82.47
+BBI,GOX,BBI-GOX,"Bhubaneswar, Odisha","Goa (Mopa), Goa",320,42,3.03,13.13,75.75
+AMD,GAU,AMD-GAU,"Ahmedabad, Gujarat","Guwahati, Assam",907,119,2.57,13.12,89.36
+GOX,GOI,GOX-GOI,"Goa (Mopa), Goa","Goa (Dabolim), Goa",481,63,3.68,13.10,80.92
+HBX,HYD,HBX-HYD,"Hubballi, Karnataka","Hyderabad, Telangana",504,66,2.85,13.10,81.51
+IXB,AMD,IXB-AMD,"Bagdogra, West Bengal","Ahmedabad, Gujarat",559,73,2.40,13.06,82.64
+BLR,BBI,BLR-BBI,"Bengaluru, Karnataka","Bhubaneswar, Odisha",2203,287,2.26,13.03,100.29
+CCU,LKO,CCU-LKO,"Kolkata, West Bengal","Lucknow, Uttar Pradesh",1269,165,2.49,13.00,92.92
+CCU,BBI,CCU-BBI,"Kolkata, West Bengal","Bhubaneswar, Odisha",1542,200,2.23,12.97,95.22
+VNS,IXC,VNS-IXC,"Varanasi, Uttar Pradesh","Chandigarh, Chandigarh",328,42,1.56,12.80,74.22
+MAA,TRZ,MAA-TRZ,"Chennai, Tamil Nadu","Tiruchirappalli, Tamil Nadu",539,69,1.90,12.80,80.54
+PAT,GOI,PAT-GOI,"Patna, Bihar","Goa (Dabolim), Goa",352,45,2.98,12.78,75.00
+LKO,GOI,LKO-GOI,"Lucknow, Uttar Pradesh","Goa (Dabolim), Goa",415,53,3.75,12.77,77.02
+IXB,BBI,IXB-BBI,"Bagdogra, West Bengal","Bhubaneswar, Odisha",377,48,2.18,12.73,75.56
+AMD,IXB,AMD-IXB,"Ahmedabad, Gujarat","Bagdogra, West Bengal",614,78,1.40,12.70,81.58
+TRZ,HYD,TRZ-HYD,"Tiruchirappalli, Tamil Nadu","Hyderabad, Telangana",622,79,2.21,12.70,81.72
+GOX,IDR,GOX-IDR,"Goa (Mopa), Goa","Indore, Madhya Pradesh",426,54,2.43,12.68,76.78
+GOI,NAG,GOI-NAG,"Goa (Dabolim), Goa","Nagpur, Maharashtra",398,50,2.20,12.56,75.24
+IDR,GOX,IDR-GOX,"Indore, Madhya Pradesh","Goa (Mopa), Goa",478,60,2.13,12.55,77.47
+GOX,BBI,GOX-BBI,"Goa (Mopa), Goa","Bhubaneswar, Odisha",351,44,0.94,12.54,73.50
+BHO,HYD,BHO-HYD,"Bhopal, Madhya Pradesh","Hyderabad, Telangana",628,78,2.36,12.42,80.04
+BBI,GOI,BBI-GOI,"Bhubaneswar, Odisha","Goa (Dabolim), Goa",323,40,1.07,12.38,71.59
+SXR,LKO,SXR-LKO,"Srinagar, Jammu and Kashmir","Lucknow, Uttar Pradesh",534,66,2.44,12.36,77.65
+GAU,BBI,GAU-BBI,"Guwahati, Assam","Bhubaneswar, Odisha",585,72,1.75,12.31,78.44
+CJB,CCU,CJB-CCU,"Coimbatore, Tamil Nadu","Kolkata, West Bengal",547,67,2.45,12.25,77.24
+IXC,GAU,IXC-GAU,"Chandigarh, Chandigarh","Guwahati, Assam",385,47,2.71,12.21,72.71
+COK,GAU,COK-GAU,"Kochi, Kerala","Guwahati, Assam",817,99,2.01,12.12,81.27
+AMD,RPR,AMD-RPR,"Ahmedabad, Gujarat","Raipur, Chhattisgarh",413,50,2.20,12.11,72.95
+IXE,COK,IXE-COK,"Mangaluru, Karnataka","Kochi, Kerala",430,52,1.77,12.09,73.36
+GOI,BBI,GOI-BBI,"Goa (Dabolim), Goa","Bhubaneswar, Odisha",340,41,1.86,12.06,70.33
+HBX,MAA,HBX-MAA,"Hubballi, Karnataka","Chennai, Tamil Nadu",423,51,1.80,12.06,72.94
+NAG,BLR,NAG-BLR,"Nagpur, Maharashtra","Bengaluru, Karnataka",1634,196,1.97,12.00,88.76
+RPR,BLR,RPR-BLR,"Raipur, Chhattisgarh","Bengaluru, Karnataka",1163,139,1.92,11.95,84.38
+JAI,SXR,JAI-SXR,"Jaipur, Rajasthan","Srinagar, Jammu and Kashmir",547,65,1.90,11.88,74.94
+BBI,GAU,BBI-GAU,"Bhubaneswar, Odisha","Guwahati, Assam",611,72,2.07,11.78,75.61
+RPR,HYD,RPR-HYD,"Raipur, Chhattisgarh","Hyderabad, Telangana",800,94,1.38,11.75,78.56
+PNQ,GAU,PNQ-GAU,"Pune, Maharashtra","Guwahati, Assam",758,89,2.20,11.74,77.87
+CCU,IXZ,CCU-IXZ,"Kolkata, West Bengal","Port Blair, Andaman and Nicobar",695,81,1.90,11.65,76.28
+CCU,GAU,CCU-GAU,"Kolkata, West Bengal","Guwahati, Assam",1867,216,1.60,11.57,87.15
+BBI,IXB,BBI-IXB,"Bhubaneswar, Odisha","Bagdogra, West Bengal",373,43,0.99,11.53,68.30
+BHO,CCU,BHO-CCU,"Bhopal, Madhya Pradesh","Kolkata, West Bengal",475,54,0.89,11.37,70.09
+IXB,GAU,IXB-GAU,"Bagdogra, West Bengal","Guwahati, Assam",449,51,1.17,11.36,69.39
+GOX,GAU,GOX-GAU,"Goa (Mopa), Goa","Guwahati, Assam",397,44,1.37,11.08,66.35
+GAU,CCU,GAU-CCU,"Guwahati, Assam","Kolkata, West Bengal",1856,200,0.80,10.78,81.11
+NAG,IDR,NAG-IDR,"Nagpur, Maharashtra","Indore, Madhya Pradesh",345,37,1.71,10.72,62.70
+GAU,IDR,GAU-IDR,"Guwahati, Assam","Indore, Madhya Pradesh",349,35,0.51,10.03,58.75

@@ -20,6 +20,16 @@ import flight_delay_pipeline as pipeline  # noqa: E402  (configures Java/Hadoop 
 from make_sample_data import COLUMNS, GUIDE_ROWS, random_rows  # noqa: E402
 
 
+def read_registered_js(path: Path, registry: str, key: str) -> dict:
+    """Parse a data file of the form `window.X = window.X || {};
+window.X["key"] = {...};`."""
+    lines = path.read_text(encoding="utf-8").splitlines()
+    assert lines[0] == f"window.{registry} = window.{registry} || {{}};"
+    prefix = f'window.{registry}["{key}"] = '
+    assert lines[1].startswith(prefix)
+    return json.loads(lines[1][len(prefix):].rstrip(";"))
+
+
 def write_csv(path: Path, header: list[str], rows: list[list]) -> Path:
     with path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.writer(handle)
@@ -206,6 +216,55 @@ def test_website_tables(spark, tmp_path):
     json.dumps(data, allow_nan=False)  # must serialise for the website
 
 
+def test_india_simulation_is_valid_and_calibrated(spark, tmp_path):
+    from datetime import date as day
+    import make_india_data as india
+
+    frame = india.generate(day(2025, 12, 1), day(2026, 1, 31), flights_per_day=400, seed=5)
+    again = india.generate(day(2025, 12, 1), day(2026, 1, 31), flights_per_day=400, seed=5)
+    assert frame.equals(again)  # reproducible from the seed
+    assert list(frame.columns) == india.COLUMNS
+    assert len(frame) == 400 * 62
+    assert set(frame["Reporting_Airline"]) <= set(india.AIRLINES)
+    assert set(frame["Origin"]) | set(frame["Dest"]) <= set(india.AIRPORTS)
+    assert (frame["Origin"] != frame["Dest"]).all()
+
+    operated = frame[frame["ArrDelay"].notna()]
+    late = operated[operated["ArrDelay"] >= 15]
+    # Cause minutes add up to the arrival delay for late flights, as in BTS data.
+    causes = late[india.CAUSES].sum(axis=1)
+    assert (causes - late["ArrDelay"]).abs().max() < 1e-6
+    assert operated.loc[operated["ArrDelay"] < 15, india.CAUSES].isna().all().all()
+    # SpiceJet must be far less punctual than IndiGo, as in DGCA data.
+    rate = operated.groupby("Reporting_Airline")["ArrDelay"].apply(lambda s: (s >= 15).mean())
+    assert rate["SG"] > rate["6E"] + 0.15
+    # Winter fog makes Delhi departures later than Bengaluru ones.
+    by_origin = operated.groupby("Origin")["ArrDelay"].apply(lambda s: (s >= 15).mean())
+    assert by_origin["DEL"] > by_origin["BLR"]
+
+    path = tmp_path / "india.csv"
+    frame.to_csv(path, index=False, float_format="%.0f")
+    df = pipeline.load_and_standardize(spark, path)
+    assert df.count() == len(frame)
+    row = df.filter("origin = 'BOM'").first()
+    assert row.origin_city == "Mumbai, Maharashtra"
+    names = {r.airline_name for r in pipeline.build_summaries(df, 1, 1)["airline_summary.csv"].collect()}
+    assert {"IndiGo", "Air India", "SpiceJet"} <= names
+
+
+def test_dataset_paths_keep_usa_layout(tmp_path):
+    import datasets
+
+    usa, india = datasets.paths("usa", tmp_path), datasets.paths("india", tmp_path)
+    assert usa["input"] == tmp_path / "data" / "raw" / "flights.csv"
+    assert usa["summaries"] == tmp_path / "output" / "powerbi"
+    assert india["input"] == tmp_path / "data" / "raw" / "india" / "flights.csv"
+    assert india["summaries"] == tmp_path / "output" / "india" / "powerbi"
+    assert india["website_data"].name == "site-data-india.js"
+    with pytest.raises(ValueError):
+        datasets.paths("mars", tmp_path)
+
+
 def test_download_month_range():
     from download_bts_data import month_range
     assert list(month_range(date(2025, 11, 1), date(2026, 2, 1))) == [(2025, 11), (2025, 12), (2026, 1), (2026, 2)]
@@ -235,13 +294,11 @@ def test_end_to_end_writes_all_outputs(tmp_path, monkeypatch):
     assert list(processed.glob("year_month=*/*.parquet"))
     assert (tmp_path / "output" / "run_summary.txt").exists()
 
-    text = (dash / "data.js").read_text(encoding="utf-8")
-    assert text.startswith("window.DASHBOARD_DATA = ")
-    data = json.loads(text[len("window.DASHBOARD_DATA = "):].rstrip().rstrip(";"))
+    data = read_registered_js(dash / "data-usa.js", "DASHBOARD_DATASETS", "usa")
     assert data["kpi"]["cleaned_records"] == 1500
     assert len(data["monthly"]) == 12 and data["routes"]
+    assert data["meta"]["option"] == "International"
 
-    site = (tmp_path / "website" / "data" / "site-data.js").read_text(encoding="utf-8")
-    assert site.startswith("window.SITE_DATA = ")
-    site_data = json.loads(site[len("window.SITE_DATA = "):].rstrip().rstrip(";"))
+    site_data = read_registered_js(tmp_path / "website" / "data" / "site-data-usa.js", "SITE_DATASETS", "usa")
     assert site_data["overall"]["flights"] == 1500 and site_data["airline_names"]["DL"] == "Delta Air Lines"
+    assert site_data["dataset"]["country"] == "USA"

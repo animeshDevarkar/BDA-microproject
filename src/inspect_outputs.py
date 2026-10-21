@@ -1,13 +1,22 @@
-"""Print the main summary tables with Pandas (small files only, never the raw data)."""
+"""Print the main summary tables with Pandas (small files only, never the raw data).
+
+    python src/inspect_outputs.py            # International (USA)
+    python src/inspect_outputs.py india      # Domestic (India)
+"""
+import sys
 from pathlib import Path
 
 import pandas as pd
 
-OUT = Path(__file__).resolve().parents[1] / "output" / "powerbi"
+import datasets
+
+DATASET = sys.argv[1] if len(sys.argv) > 1 else datasets.DEFAULT
+OUT = datasets.paths(DATASET, Path(__file__).resolve().parents[1])["summaries"]
 
 pd.set_option("display.width", 160)
 pd.set_option("display.max_columns", 12)
 
+print(f"Dataset: {DATASET} ({datasets.DATASETS[DATASET].option}) - {OUT}")
 for title, name, rows in [
     ("KPIs", "kpi_summary.csv", 20),
     ("Monthly summary", "monthly_summary.csv", 24),

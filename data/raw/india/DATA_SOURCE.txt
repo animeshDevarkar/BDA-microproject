@@ -1,0 +1,7 @@
+Source: SIMULATED Indian domestic flights, calibrated to DGCA on-time performance levels (not real flight records)
+Method: src/make_india_data.py - real airports, airlines and route network; delay rates matched to DGCA monthly OTP by airline, with fog, monsoon and congestion effects
+References: DGCA monthly domestic traffic & OTP releases; data.gov.in 'Airline-wise Details of Monthly On-Time Performance Data in Respect of Scheduled Domestic Airlines'
+Period: 2025-09 to 2026-08
+Downloaded: 2026-10-22
+Rows: 1,149,750
+Seed: 2026

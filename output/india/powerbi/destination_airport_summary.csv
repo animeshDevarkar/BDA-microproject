@@ -1,0 +1,44 @@
+destination,destination_city,flights,arrival_delayed_flights,average_arrival_delay_min,arrival_delay_rate_pct,priority_score
+ATQ,"Amritsar, Punjab",8020,1665,7.68,20.76,186.63
+IXL,"Leh, Ladakh",2419,498,7.59,20.59,160.40
+DEL,"Delhi, Delhi",161282,33015,7.67,20.47,245.46
+VNS,"Varanasi, Uttar Pradesh",13027,2614,7.31,20.07,190.12
+IXR,"Ranchi, Jharkhand",7360,1474,7.51,20.03,178.32
+BOM,"Mumbai, Maharashtra",138389,27537,7.12,19.90,235.55
+DED,"Dehradun, Uttarakhand",5302,1052,6.71,19.84,170.16
+IXC,"Chandigarh, Chandigarh",15216,2990,7.06,19.65,189.24
+SXR,"Srinagar, Jammu and Kashmir",15267,2997,7.15,19.63,189.11
+IXJ,"Jammu, Jammu and Kashmir",5450,1060,6.98,19.45,167.34
+CCJ,"Kozhikode, Kerala",8779,1704,6.76,19.41,176.25
+IXZ,"Port Blair, Andaman and Nicobar",4994,968,6.48,19.38,165.07
+PNQ,"Pune, Maharashtra",37795,7302,6.59,19.32,203.63
+COK,"Kochi, Kerala",42147,8045,6.67,19.09,203.27
+MAA,"Chennai, Tamil Nadu",76932,14471,6.36,18.81,211.63
+TRV,"Thiruvananthapuram, Kerala",12410,2334,6.40,18.81,177.29
+CJB,"Coimbatore, Tamil Nadu",8925,1651,6.25,18.50,168.28
+JAI,"Jaipur, Rajasthan",22417,4132,6.36,18.43,184.65
+LKO,"Lucknow, Uttar Pradesh",22438,4122,6.32,18.37,184.05
+PAT,"Patna, Bihar",16699,3065,6.45,18.35,178.46
+IXM,"Madurai, Tamil Nadu",3784,693,6.37,18.31,150.89
+HBX,"Hubballi, Karnataka",2928,536,5.90,18.31,146.13
+GOI,"Goa (Dabolim), Goa",18085,3299,6.00,18.24,178.82
+BDQ,"Vadodara, Gujarat",6328,1145,5.72,18.09,158.38
+TRZ,"Tiruchirappalli, Tamil Nadu",3881,702,6.05,18.09,149.48
+STV,"Surat, Gujarat",3800,684,5.27,18.00,148.37
+IXE,"Mangaluru, Karnataka",6413,1148,5.79,17.90,156.93
+IMF,"Imphal, Manipur",4992,892,5.33,17.87,152.17
+UDR,"Udaipur, Rajasthan",5463,967,5.23,17.70,152.33
+NAG,"Nagpur, Maharashtra",12946,2286,5.22,17.66,167.20
+BHO,"Bhopal, Madhya Pradesh",6272,1099,5.40,17.52,153.22
+HYD,"Hyderabad, Telangana",93798,16333,5.21,17.41,199.36
+GOX,"Goa (Mopa), Goa",18173,3136,5.67,17.26,169.25
+AMD,"Ahmedabad, Gujarat",45190,7780,4.99,17.22,184.53
+BLR,"Bengaluru, Karnataka",130945,22472,5.12,17.16,202.20
+RPR,"Raipur, Chhattisgarh",7522,1289,5.25,17.14,152.95
+IDR,"Indore, Madhya Pradesh",15622,2670,5.11,17.09,165.04
+CCU,"Kolkata, West Bengal",61671,10380,4.87,16.83,185.64
+DIB,"Dibrugarh, Assam",2556,424,4.61,16.59,130.16
+IXB,"Bagdogra, West Bengal",12004,1990,4.75,16.58,155.72
+VTZ,"Visakhapatnam, Andhra Pradesh",10631,1704,4.29,16.03,148.61
+GAU,"Guwahati, Assam",21187,3282,4.12,15.49,154.31
+BBI,"Bhubaneswar, Odisha",16499,2532,3.80,15.35,149.03

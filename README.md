@@ -17,6 +17,37 @@ BTS ZIPs ──► download_bts_data.py ──► data/raw/flights.csv
                                dashboard/index.html                    (import the CSVs)
 ```
 
+## Data options: International and Domestic
+
+The project runs the same pipeline on two datasets. The dashboard and the website have a switch between them.
+
+| Option | Data | Files |
+|---|---|---|
+| **International · USA** | Real U.S. BTS on-time records, Sep 2025 – Aug 2026 (7.05M flights) | `data/raw/flights.csv` → `output/powerbi/` |
+| **Domestic · India** | **Simulated** Indian domestic flights, Sep 2025 – Aug 2026 (1.15M flights) | `data/raw/india/flights.csv` → `output/india/powerbi/` |
+
+**Why the India data is simulated:** India's regulator DGCA publishes only monthly on-time-performance (OTP)
+percentages per airline at a few metro airports. There is no public flight-by-flight file like the BTS one.
+`src/make_india_data.py` generates realistic records instead, reproducible from a seed:
+- **Network:** 43 real airports, a gravity-model route network (684 routes) and 8 real airlines at their market shares (IndiGo 64%, Air India group, Akasa, SpiceJet, Alliance Air, Star Air, Fly91).
+- **Delay rates:** each airline's late rate is calibrated to DGCA OTP levels: IndiGo about 14% late, Akasa 15%, Air India 27%, SpiceJet 49%.
+- **Seasons and congestion:**
+  - winter fog in north India (Dec–Feb);
+  - south-west monsoon on the west coast (Jun–Sep);
+  - north-east monsoon in Tamil Nadu (Oct–Dec);
+  - evening congestion and busy hubs (DEL/BOM/BLR).
+- **Causes:** reactionary (late-aircraft) delay is the largest cause.
+
+It uses the BTS column layout, so the PySpark pipeline runs on it unchanged. The site and the dashboard label it
+**Simulated** everywhere. Use it to demonstrate the pipeline, not as real-world evidence.
+
+```powershell
+python src\make_india_data.py                          # generate data\raw\india\flights.csv (~22 s)
+python src\flight_delay_pipeline.py --dataset india    # Spark pipeline for India
+python src\flight_delay_pipeline.py --dataset usa      # (default) Spark pipeline for the USA
+python src\inspect_outputs.py india                    # print the India summaries
+```
+
 ## Quick start (Windows)
 
 ```powershell
@@ -29,7 +60,7 @@ powershell -ExecutionPolicy Bypass -File setup_windows.ps1   # once: JDK 17, ven
 
 | Command | What it does |
 |---|---|
-| `.\run_all.ps1` | Uses existing `data\raw\flights.csv` (downloads Jun–Aug 2026 if missing) |
+| `.\run_all.ps1` | Runs both datasets. Uses existing data; downloads Jun–Aug 2026 BTS data and generates the India data if missing |
 | `.\run_all.ps1 -Start 2025-09 -End 2026-08` | Downloads those BTS months first, then runs |
 | `.\run_all.ps1 -Sample` | 20,000-row **synthetic** sample, no internet needed |
 | `.\run_all.ps1 -SkipTests` | Skips pytest |
@@ -39,31 +70,39 @@ powershell -ExecutionPolicy Bypass -File setup_windows.ps1   # once: JDK 17, ven
 ```powershell
 .\.venv\Scripts\Activate.ps1
 python src\download_bts_data.py --start 2025-09 --end 2026-08   # real data → data\raw\flights.csv
-python src\flight_delay_pipeline.py                             # Spark pipeline + dashboard data
+python src\flight_delay_pipeline.py                             # Spark pipeline (USA) + dashboard/website data
+python src\make_india_data.py                                   # simulated India data (once)
+python src\flight_delay_pipeline.py --dataset india             # Spark pipeline (India)
 python -m pytest -q                                             # automated checks
 start dashboard\index.html                                      # open the dashboard
 python src\inspect_outputs.py                                   # print summaries with Pandas
 ```
 
-Pipeline options: `--input`, `--processed`, `--output`, `--min-group-flights` (default 100),
-`--min-route-flights` (default 50), `--driver-memory` (default 4g), `--skip-dashboard`.
+Pipeline options: `--dataset usa|india`, `--input`, `--processed`, `--output`, `--min-group-flights` (default 100),
+`--min-route-flights` (default 50), `--driver-memory` (default 4g), `--skip-dashboard`, `--skip-website`.
 
 ## Project layout
 
 ```
 flight-delay-bda/
 ├── data/raw/flights.csv            downloaded BTS data (+ DATA_SOURCE.txt: period, date, rows)
-├── data/processed/flights_clean/   cleaned Parquet, partitioned by year_month
-├── output/powerbi/                 9 summary CSVs for Power BI and the dashboard
+├── data/raw/india/flights.csv      simulated Indian domestic flights (+ DATA_SOURCE.txt)
+├── data/processed/flights_clean/   cleaned Parquet, partitioned by year_month (india/ for India)
+├── output/powerbi/                 9 summary CSVs for Power BI and the dashboard (USA)
+├── output/india/powerbi/           the same 9 CSVs for India
 ├── output/run_summary.txt          run metadata
-├── dashboard/index.html            offline dashboard (reads dashboard/data.js)
+├── dashboard/index.html            offline dashboard (reads data-usa.js / data-india.js)
+├── website/                        OnTime Check customer site (data/site-data-usa.js, site-data-india.js)
 ├── powerbi/flight_delay_theme.json Power BI colour theme matching the dashboard
 ├── src/
 │   ├── flight_delay_pipeline.py    main PySpark pipeline
+│   ├── datasets.py                 the two data options and their file locations
+│   ├── make_india_data.py          simulated Indian domestic flights (DGCA-calibrated)
+│   ├── build_website_data.py       Spark aggregates for the customer website
 │   ├── spark_env.py                finds Java, sets HADOOP_HOME/short paths for Windows
 │   ├── download_bts_data.py        fetches official BTS monthly files
 │   ├── make_sample_data.py         synthetic sample for setup testing
-│   ├── build_dashboard.py          bundles CSVs into dashboard/data.js
+│   ├── build_dashboard.py          bundles CSVs into dashboard/data-<dataset>.js
 │   ├── inspect_outputs.py          Pandas inspection of summaries
 │   └── plot_monthly.py             optional Matplotlib chart
 ├── tests/test_pipeline.py          pytest suite (self-contained, uses temp files)
@@ -72,7 +111,7 @@ flight-delay-bda/
 ├── setup_windows.ps1, run_all.ps1, requirements.txt
 ```
 
-## Outputs (`output/powerbi/`)
+## Outputs (`output/powerbi/`, and `output/india/powerbi/` for India)
 
 | File | Grain | Key columns |
 |---|---|---|
@@ -124,7 +163,8 @@ follows the system and can be toggled. The data is refreshed every time the pipe
 - Light and dark mode, keyboard support, and works on phones.
 
 How it is built: the pipeline (or `python src/build_website_data.py`, which reads the saved Parquet)
-aggregates the data with Spark into `website/data/site-data.js`, about 0.9 MB. The aggregates are:
+aggregates the data with Spark into `website/data/site-data-usa.js` (about 0.9 MB) and `site-data-india.js` (about 0.2 MB).
+A switch in the header changes between **International · USA** and **Domestic · India**. The aggregates are:
 - route;
 - route × airline;
 - airport × hour, airport × month and airport × weekday.
@@ -141,7 +181,7 @@ The site is static, so any static host can serve the `website/` folder for free.
 | **GitHub Pages** | Push this project to a GitHub repo (`main` branch). Then Settings → Pages → Source: **GitHub Actions**. `.github/workflows/deploy-website.yml` publishes `website/` on every push, to `https://<user>.github.io/<repo>/`. |
 | **Netlify / Vercel from Git** | Import the repo. `netlify.toml` / `vercel.json` already set the publish folder to `website` with no build command. |
 
-To publish new data, re-run the pipeline, then upload or commit the new `website/data/site-data.js`.
+To publish new data, re-run the pipeline, then upload or commit the new `website/data/site-data-*.js` files.
 Raw and Parquet data are git-ignored, so the repository stays small.
 
 ## Power BI
@@ -173,11 +213,11 @@ A `.pbix` file can only be authored in Power BI Desktop, so build it from the CS
 | `Input CSV not found` | run `download_bts_data.py` or `make_sample_data.py` |
 | Empty airline/airport/route summaries | sample too small for the 100/50-flight minimums; use real data or lower `--min-*-flights` |
 | Out of memory | download fewer months, or `--driver-memory 6g` |
-| Dashboard says "No data yet" | run the pipeline; it writes `dashboard/data.js` |
+| Dashboard says "No data yet" | run the pipeline; it writes `dashboard/data-usa.js` (`data-india.js` with `--dataset india`) |
 
 ## Limitations
 
-U.S. reporting carriers only; historical and descriptive (no prediction). Delay-cause fields
+USA: U.S. reporting carriers only. India: simulated records calibrated to DGCA levels, not real flights. Both: historical and descriptive (no prediction). Delay-cause fields
 are blank for on-time flights. High delay metrics flag hotspots for investigation; they do
 not prove that an airport or airline caused the delays. The synthetic sample is for setup
 testing only and must not be used as evidence.

@@ -1,0 +1,9 @@
+airline,flights,arrival_delayed_flights,average_arrival_delay_min,average_departure_delay_min,arrival_delay_rate_pct,scheduled_flights,cancelled_flights,cancellation_rate_pct,airline_name
+SG,33134,16306,24.40,28.36,49.21,34266,1078,3.15,SpiceJet
+9I,13411,4213,13.74,17.79,31.41,13967,533,3.82,Alliance Air
+AI,192117,51885,11.27,15.27,27.01,194877,2417,1.24,Air India
+IX,101665,25200,9.95,13.97,24.79,103355,1504,1.46,Air India Express
+S5,5653,1166,7.69,11.82,20.63,5788,126,2.18,Star Air
+IC,3435,614,5.10,8.96,17.87,3506,63,1.80,Fly91
+QP,56826,8486,4.12,8.11,14.93,57423,497,0.87,Akasa Air
+6E,729717,102269,3.44,7.44,14.01,736545,5563,0.76,IndiGo

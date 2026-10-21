@@ -1,0 +1,11 @@
+Flight Delay Analysis completed.
+Dataset: india (Domestic)
+Run at: 2026-10-22 00:40:25
+Input: C:\Users\Animesh29\Desktop\BDA microproject\flight-delay-bda\data\raw\india\flights.csv
+Cleaned records: 1,149,727
+Delay threshold: arrival delay >= 15 minutes
+Minimum flights: airline/airport 100, route 50
+Parquet: C:\Users\Animesh29\Desktop\BDA microproject\flight-delay-bda\data\processed\india\flights_clean
+Summary CSVs: C:\Users\Animesh29\Desktop\BDA microproject\flight-delay-bda\output\india\powerbi
+Elapsed: 93.6 s
+Log: C:\Users\Animesh29\Desktop\BDA microproject\flight-delay-bda\logs\pipeline_20261022_003852.log

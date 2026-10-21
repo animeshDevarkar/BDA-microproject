@@ -6,7 +6,8 @@ cleaned records to Parquet and exports small summary CSVs for Power BI and the
 web dashboard.
 
 Usage:
-    python src/flight_delay_pipeline.py
+    python src/flight_delay_pipeline.py                    # International (USA) data
+    python src/flight_delay_pipeline.py --dataset india    # Domestic (India) data
     python src/flight_delay_pipeline.py --input data/raw/flights.csv --output output/powerbi
 """
 from __future__ import annotations
@@ -20,6 +21,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
+import datasets
 import spark_env
 
 spark_env.configure()
@@ -30,9 +32,6 @@ from pyspark.sql.types import DecimalType, DoubleType, IntegerType, StringType  
 from pyspark.sql.window import Window  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_INPUT = ROOT / "data" / "raw" / "flights.csv"
-DEFAULT_PROCESSED = ROOT / "data" / "processed" / "flights_clean"
-DEFAULT_OUTPUT = ROOT / "output" / "powerbi"
 LOG_DIR = ROOT / "logs"
 
 DELAY_THRESHOLD_MIN = 15
@@ -70,6 +69,9 @@ AIRLINE_NAMES = {
     "YV": "Mesa Airlines", "YX": "Republic Airways", "EV": "ExpressJet Airlines",
     "VX": "Virgin America", "ZW": "Air Wisconsin", "C5": "CommutAir",
     "G7": "GoJet Airlines", "PT": "Piedmont Airlines", "CP": "Compass Airlines",
+    # Indian domestic carriers (Domestic option)
+    "6E": "IndiGo", "AI": "Air India", "IX": "Air India Express", "QP": "Akasa Air",
+    "SG": "SpiceJet", "9I": "Alliance Air", "S5": "Star Air", "IC": "Fly91",
 }
 
 DAY_NAMES = {1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat", 7: "Sun"}
@@ -511,9 +513,11 @@ def make_summaries(df: DataFrame, output_dir: Path, min_group_flights: int = 100
 
 def main(argv: Optional[list[str]] = None) -> int:
     parser = argparse.ArgumentParser(description="Flight delay analysis using PySpark")
-    parser.add_argument("--input", default=str(DEFAULT_INPUT), help="Input CSV path")
-    parser.add_argument("--processed", default=str(DEFAULT_PROCESSED), help="Parquet output directory")
-    parser.add_argument("--output", default=str(DEFAULT_OUTPUT), help="Summary CSV output directory")
+    parser.add_argument("--dataset", choices=list(datasets.DATASETS), default=datasets.DEFAULT,
+                        help="usa = International (USA, BTS), india = Domestic (India, simulated)")
+    parser.add_argument("--input", help="Input CSV path (default: the dataset's flights.csv)")
+    parser.add_argument("--processed", help="Parquet output directory")
+    parser.add_argument("--output", help="Summary CSV output directory")
     parser.add_argument("--min-group-flights", type=int, default=100,
                         help="Minimum flights for airline/airport rankings (default 100)")
     parser.add_argument("--min-route-flights", type=int, default=50,
@@ -525,15 +529,17 @@ def main(argv: Optional[list[str]] = None) -> int:
                         help="Do not refresh the customer website data file")
     args = parser.parse_args(argv)
 
-    input_path = Path(args.input).resolve()
-    processed_path = Path(args.processed).resolve()
-    output_path = Path(args.output).resolve()
+    locations = datasets.paths(args.dataset, ROOT)
+    input_path = Path(args.input or locations["input"]).resolve()
+    processed_path = Path(args.processed or locations["processed"]).resolve()
+    output_path = Path(args.output or locations["summaries"]).resolve()
 
     log_file = setup_logging()
     started = time.time()
     spark = build_spark(args.driver_memory)
     spark.sparkContext.setLogLevel("ERROR")
     try:
+        log.info("Dataset: %s (%s)", args.dataset, datasets.DATASETS[args.dataset].option)
         log.info("Reading input: %s", input_path)
         flights = load_and_standardize(spark, input_path).cache()
         count = flights.count()
@@ -552,13 +558,14 @@ def main(argv: Optional[list[str]] = None) -> int:
         make_summaries(flights, output_path, args.min_group_flights, args.min_route_flights)
         if not args.skip_website:
             import build_website_data
-            build_website_data.write_site_data(flights, ROOT / "website" / "data" / "site-data.js")
+            build_website_data.write_site_data(flights, locations["website_data"], args.dataset)
 
         elapsed = time.time() - started
-        summary = ROOT / "output" / "run_summary.txt"
+        summary = locations["run_summary"]
         summary.parent.mkdir(parents=True, exist_ok=True)
         summary.write_text(
             "Flight Delay Analysis completed.\n"
+            f"Dataset: {args.dataset} ({datasets.DATASETS[args.dataset].option})\n"
             f"Run at: {datetime.now():%Y-%m-%d %H:%M:%S}\n"
             f"Input: {input_path}\n"
             f"Cleaned records: {count:,}\n"
@@ -576,7 +583,7 @@ def main(argv: Optional[list[str]] = None) -> int:
 
     if not args.skip_dashboard:
         import build_dashboard
-        build_dashboard.build(output_path)
+        build_dashboard.build(output_path, args.dataset)
     return 0
 
 

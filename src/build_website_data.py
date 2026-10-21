@@ -3,12 +3,13 @@
 The website answers traveller questions ("how often is my flight late?"), so it
 needs finer-grained aggregates than the Power BI summaries: route x airline,
 departure hour per airport and month per airport. They are computed with Spark
-and written as one compact JavaScript file, website/data/site-data.js, which the
-static site loads (works from disk and on any static host).
+and written as one compact JavaScript file per dataset, website/data/site-data-<dataset>.js,
+which the static site loads (works from disk and on any static host).
 
 The pipeline calls this automatically. To rebuild from the saved Parquet only:
 
-    python src/build_website_data.py
+    python src/build_website_data.py                  # International (USA)
+    python src/build_website_data.py --dataset india  # Domestic (India)
 """
 from __future__ import annotations
 
@@ -19,6 +20,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
+import datasets
 import spark_env
 
 spark_env.configure()
@@ -27,8 +29,6 @@ from pyspark.sql import DataFrame  # noqa: E402
 from pyspark.sql import functions as F  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_PROCESSED = ROOT / "data" / "processed" / "flights_clean"
-DEFAULT_OUTPUT = ROOT / "website" / "data" / "site-data.js"
 
 # Smallest groups the site will show. Below these, a rate is too noisy to quote to a customer.
 MIN_AIRPORT_FLIGHTS = 100
@@ -129,15 +129,21 @@ def build_tables(flights: DataFrame) -> dict:
     return data
 
 
-def write_site_data(flights: DataFrame, target: Path = DEFAULT_OUTPUT) -> Path:
+def write_site_data(flights: DataFrame, target: Path, dataset: str = datasets.DEFAULT) -> Path:
     from flight_delay_pipeline import AIRLINE_NAMES
 
+    info = datasets.DATASETS[dataset]
     data = build_tables(flights)
     data["airline_names"] = AIRLINE_NAMES
+    data["dataset"] = {"key": info.key, "option": info.option, "country": info.country,
+                       "region_name": info.region_name, "source": info.source_name,
+                       "simulated": info.simulated}
     target = Path(target)
     target.parent.mkdir(parents=True, exist_ok=True)
     payload = json.dumps(data, separators=(",", ":"), allow_nan=False)
-    target.write_text(f"window.SITE_DATA = {payload};\n", encoding="utf-8")
+    # Each dataset registers itself, so the site can load both files and switch between them.
+    target.write_text("window.SITE_DATASETS = window.SITE_DATASETS || {};\n"
+                      f"window.SITE_DATASETS[{json.dumps(info.key)}] = {payload};\n", encoding="utf-8")
     print(f"Website data written: {target} ({len(payload) / 1024:.0f} KB)")
     return target
 
@@ -145,19 +151,23 @@ def write_site_data(flights: DataFrame, target: Path = DEFAULT_OUTPUT) -> Path:
 def main(argv: Optional[list[str]] = None) -> int:
     from flight_delay_pipeline import build_spark
 
-    parser = argparse.ArgumentParser(description="Build website/data/site-data.js from the cleaned Parquet")
-    parser.add_argument("--processed", default=str(DEFAULT_PROCESSED), help="Cleaned Parquet directory")
-    parser.add_argument("--output", default=str(DEFAULT_OUTPUT), help="Target .js file")
+    parser = argparse.ArgumentParser(description="Build website/data/site-data-<dataset>.js from the cleaned Parquet")
+    parser.add_argument("--dataset", choices=list(datasets.DATASETS), default=datasets.DEFAULT)
+    parser.add_argument("--processed", help="Cleaned Parquet directory (default: the dataset's)")
+    parser.add_argument("--output", help="Target .js file (default: the dataset's)")
     parser.add_argument("--driver-memory", default="4g", help="Spark driver memory (default 4g)")
     args = parser.parse_args(argv)
 
-    processed = Path(args.processed)
+    locations = datasets.paths(args.dataset, ROOT)
+    processed = Path(args.processed or locations["processed"])
     if not processed.exists():
-        raise FileNotFoundError(f"{processed} not found. Run python src/flight_delay_pipeline.py first.")
+        raise FileNotFoundError(f"{processed} not found. Run python src/flight_delay_pipeline.py "
+                                f"--dataset {args.dataset} first.")
     spark = build_spark(args.driver_memory)
     spark.sparkContext.setLogLevel("ERROR")
     try:
-        write_site_data(spark.read.parquet(str(processed)), Path(args.output))
+        write_site_data(spark.read.parquet(str(processed)), Path(args.output or locations["website_data"]),
+                        args.dataset)
     finally:
         spark.stop()
     return 0

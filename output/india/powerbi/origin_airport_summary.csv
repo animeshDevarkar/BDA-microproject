@@ -1,0 +1,44 @@
+origin,origin_city,flights,departure_delayed_flights,average_departure_delay_min,departure_delay_rate_pct,priority_score
+DEL,"Delhi, Delhi",160892,39643,12.03,24.64,295.39
+BOM,"Mumbai, Maharashtra",139039,33610,11.65,24.17,286.27
+IXJ,"Jammu, Jammu and Kashmir",5486,1285,10.94,23.42,201.68
+DED,"Dehradun, Uttarakhand",5455,1238,10.66,22.69,195.28
+IXR,"Ranchi, Jharkhand",7544,1707,10.83,22.63,202.03
+BLR,"Bengaluru, Karnataka",130313,29247,10.09,22.44,264.33
+CCJ,"Kozhikode, Kerala",8831,1978,10.52,22.40,203.51
+COK,"Kochi, Kerala",42135,9384,10.50,22.27,237.16
+PNQ,"Pune, Maharashtra",37647,8221,10.30,21.84,230.08
+IXM,"Madurai, Tamil Nadu",3791,825,9.41,21.76,179.33
+MAA,"Chennai, Tamil Nadu",77190,16787,9.92,21.75,244.75
+ATQ,"Amritsar, Punjab",8061,1745,9.99,21.65,194.72
+SXR,"Srinagar, Jammu and Kashmir",15430,3336,10.23,21.62,208.51
+IXC,"Chandigarh, Chandigarh",15368,3311,10.12,21.54,207.69
+LKO,"Lucknow, Uttar Pradesh",22681,4872,9.68,21.48,215.44
+TRZ,"Tiruchirappalli, Tamil Nadu",3756,800,9.60,21.30,175.32
+CJB,"Coimbatore, Tamil Nadu",8823,1873,9.58,21.23,192.87
+IXE,"Mangaluru, Karnataka",6311,1337,9.61,21.19,185.38
+DIB,"Dibrugarh, Assam",2464,522,9.45,21.19,165.45
+VNS,"Varanasi, Uttar Pradesh",13169,2778,9.60,21.09,200.10
+UDR,"Udaipur, Rajasthan",5433,1142,9.41,21.02,180.78
+IXL,"Leh, Ladakh",2405,505,9.42,21.00,163.48
+TRV,"Thiruvananthapuram, Kerala",12321,2587,9.40,21.00,197.77
+JAI,"Jaipur, Rajasthan",22332,4687,9.80,20.99,210.17
+AMD,"Ahmedabad, Gujarat",45374,9513,9.08,20.97,224.81
+PAT,"Patna, Bihar",16503,3445,9.56,20.87,202.72
+GOI,"Goa (Dabolim), Goa",18174,3772,9.45,20.75,203.56
+HYD,"Hyderabad, Telangana",94926,19675,9.16,20.73,237.55
+IXZ,"Port Blair, Andaman and Nicobar",4917,1008,9.69,20.50,174.27
+CCU,"Kolkata, West Bengal",61974,12524,8.72,20.21,222.99
+GOX,"Goa (Mopa), Goa",18263,3646,9.11,19.96,195.90
+IMF,"Imphal, Manipur",5066,1010,8.67,19.94,170.07
+IXB,"Bagdogra, West Bengal",11924,2375,8.65,19.92,186.96
+IDR,"Indore, Madhya Pradesh",15794,3143,8.56,19.90,192.38
+RPR,"Raipur, Chhattisgarh",7537,1495,8.43,19.84,177.09
+VTZ,"Visakhapatnam, Andhra Pradesh",10616,2099,8.47,19.77,183.29
+BBI,"Bhubaneswar, Odisha",16822,3314,8.53,19.70,191.69
+HBX,"Hubballi, Karnataka",2920,574,8.17,19.66,156.86
+BHO,"Bhopal, Madhya Pradesh",6268,1217,8.19,19.42,169.76
+BDQ,"Vadodara, Gujarat",6217,1207,8.26,19.41,169.59
+NAG,"Nagpur, Maharashtra",12943,2492,8.11,19.25,182.30
+STV,"Surat, Gujarat",3809,726,8.56,19.06,157.16
+GAU,"Guwahati, Assam",21022,3944,7.90,18.76,186.74

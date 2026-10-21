@@ -1,0 +1,8 @@
+day_of_week,flights,arrival_delayed_flights,average_arrival_delay_min,arrival_delay_rate_pct,day_name
+1,163505,29722,5.93,18.18,Mon
+2,159914,29224,5.99,18.27,Tue
+3,160490,29274,6.03,18.24,Wed
+4,160487,29282,5.98,18.25,Thu
+5,169615,33261,6.82,19.61,Fri
+6,150965,26040,5.39,17.25,Sat
+7,170982,33336,6.73,19.50,Sun

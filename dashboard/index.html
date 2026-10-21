@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Flight Delay Analysis</title>
-<meta name="description" content="Flight delay patterns and airport network bottlenecks from U.S. BTS on-time performance data, processed with PySpark.">
+<meta name="description" content="Flight delay patterns and airport network bottlenecks for International (USA, BTS) and Domestic (India) flights, processed with PySpark.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%232a78d6' d='M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z'/%3E%3C/svg%3E">
 <style>
 :root {
@@ -106,6 +106,8 @@ h1 { font-size: clamp(26px, 4vw, 36px); line-height: 1.15; margin: 0; letter-spa
   display: flex; gap: 10px; align-items: flex-start;
 }
 .banner svg { flex: none; margin-top: 2px; }
+.dataset-switch { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0 0 14px; font-size: 13px; color: var(--muted); }
+.dataset-switch .seg button { font-size: 14px; }
 
 /* Nav */
 nav.sections {
@@ -254,18 +256,28 @@ footer { padding: 32px 0 48px; color: var(--muted); font-size: 13px; }
 <div id="app"></div>
 <div class="tooltip" id="tooltip" role="status" aria-live="polite"></div>
 
-<script src="data.js"></script>
+<script src="data-usa.js"></script>
+<script src="data-india.js"></script>
 <script>
 "use strict";
 (function () {
   const app = document.getElementById("app");
-  const D = window.DASHBOARD_DATA;
+  /* ---------- Dataset: International (USA) or Domestic (India) ---------- */
+  const SETS = window.DASHBOARD_DATASETS || {};
+  const DATASET_ORDER = ["usa", "india"].filter(k => SETS[k]);
+  const DATASET_KEY = "flight-dashboard-dataset";
+  const datasetKey = (() => {
+    try { const q = new URLSearchParams(location.search).get("dataset"); if (q && SETS[q]) return q; } catch (e) { /* no query */ }
+    try { const v = localStorage.getItem(DATASET_KEY); if (v && SETS[v]) return v; } catch (e) { /* storage blocked */ }
+    return DATASET_ORDER[0];
+  })();
+  const D = SETS[datasetKey];
 
   if (!D) {
     app.innerHTML = '<div class="wrap"><div class="card error-box"><h2>No data yet</h2>' +
       '<p class="section-sub">Run the pipeline first, then reload this page:</p>' +
       '<p><code>python src\\flight_delay_pipeline.py</code></p>' +
-      '<p class="section-sub">It writes <code>dashboard/data.js</code> next to this file.</p></div></div>';
+      '<p class="section-sub">It writes <code>dashboard/data-usa.js</code> (and <code>data-india.js</code> with <code>--dataset india</code>) next to this file.</p></div></div>';
     return;
   }
 
@@ -745,17 +757,26 @@ footer { padding: 32px 0 48px; color: var(--muted); font-size: 13px; }
   const NAV = [["overview", "Overview"], ["time", "Time patterns"], ["airlines", "Airlines"], ["airports", "Airports"], ["routes", "Routes"], ["causes", "Causes"], ["method", "Method"]];
   const navLinks = NAV.map(([id, label]) => el("a", { href: "#" + id, text: label }));
 
+  const region = meta.region_name || "U.S.";
+  const datasetSwitch = DATASET_ORDER.length > 1 ? el("div", { class: "dataset-switch" }, el("span", { text: "Flights:" }),
+    segmented(DATASET_ORDER.map(k => [k, `${SETS[k].meta.option || k} · ${SETS[k].meta.country || k}`]), datasetKey, v => {
+      try { localStorage.setItem(DATASET_KEY, v); } catch (e) { /* storage blocked */ }
+      const url = new URL(location.href); url.searchParams.set("dataset", v); location.href = url.toString();
+    }, "Choose flights")) : null;
   const header = el("header", { class: "top" }, el("div", { class: "wrap" },
-    el("p", { class: "eyebrow", text: "Big Data Analytics · PySpark pipeline" }),
+    datasetSwitch,
+    el("p", { class: "eyebrow", text: `Big Data Analytics · PySpark pipeline · ${meta.option || "International"} (${meta.country || "USA"})` }),
     el("h1", { text: "Flight delays & airport network bottlenecks" }),
-    el("p", { class: "lede", text: "Where and when U.S. flights arrive late — by month, hour, airline, airport and route — with flight volume shown beside every rate so busy airports aren't confused with bad ones." }),
+    el("p", { class: "lede", text: `Where and when ${region === "U.S." ? "U.S." : region + "'s domestic"} flights arrive late — by month, hour, airline, airport and route — with flight volume shown beside every rate so busy airports aren't confused with bad ones.` }),
     el("div", { class: "meta-row" },
       el("span", {}, "Period ", el("b", { text: firstDate ? `${niceDate(firstDate)} – ${niceDate(lastDate)}` : (meta.period || "–") })),
-      el("span", {}, "Source ", el("b", { text: meta.synthetic ? "Synthetic sample" : "U.S. BTS On-Time Performance" })),
+      el("span", {}, "Source ", el("b", { text: meta.synthetic ? "Synthetic sample" : (meta.source_name || "U.S. BTS On-Time Performance") })),
       el("span", {}, "Delayed = ", el("b", { text: "arrival ≥ 15 min late" })),
       el("span", {}, "Updated ", el("b", { text: meta.generated_at || "–" }))),
     meta.synthetic ? el("div", { class: "banner", role: "note" }, icon(ICONS.alert),
-      el("span", {}, el("b", { text: "Synthetic data. " }), "These numbers come from a generated test sample and are not real-world evidence. Run ", el("code", { text: "src/download_bts_data.py" }), " for official BTS data.")) : null));
+      el("span", {}, el("b", { text: "Synthetic data. " }), "These numbers come from a generated test sample and are not real-world evidence. Run ", el("code", { text: "src/download_bts_data.py" }), " for official BTS data.")) :
+    meta.simulated ? el("div", { class: "banner", role: "note" }, icon(ICONS.alert),
+      el("span", {}, el("b", { text: "Simulated data. " }), "India's DGCA publishes only monthly on-time percentages per airline, not flight-level records. These flights are generated by ", el("code", { text: "src/make_india_data.py" }), " with real airports, airlines and routes, and delay rates calibrated to DGCA on-time performance. Use them to demonstrate the pipeline, not as real-world evidence.")) : null));
   const nav = el("nav", { class: "sections", "aria-label": "Sections" }, el("div", { class: "wrap" }, el("div", { class: "nav-links" }, navLinks), themeBtn));
 
   /* ---------- Overview ---------- */
@@ -994,16 +1015,16 @@ footer { padding: 32px 0 48px; color: var(--muted); font-size: 13px; }
     el("div", { class: "section-head" }, el("div", {}, el("h2", { text: "Methodology & caveats" }))),
     el("div", { class: "card" }, el("dl", {},
       el("dt", { text: "Data source" }), el("dd", { text: `${meta.source || "–"}${meta.period ? ` · period ${meta.period}` : ""}${meta.downloaded ? ` · downloaded ${meta.downloaded}` : ""}.` }),
-      el("dt", { text: "Delayed flight" }), el("dd", { text: "An operated flight whose arrival delay is 15 minutes or more (the common U.S. on-time threshold)." }),
+      el("dt", { text: "Delayed flight" }), el("dd", { text: "An operated flight whose arrival delay is 15 minutes or more (the common on-time threshold used by BTS and DGCA)." }),
       el("dt", { text: "Arrival delay rate" }), el("dd", { text: "Delayed operated flights ÷ operated flights with a known arrival delay × 100. Cancelled and diverted flights are excluded from both and reported separately." }),
       el("dt", { text: "Departure delay rate" }), el("dd", { text: "Used for origin airports: non-cancelled flights departing 15+ minutes late ÷ non-cancelled flights with a known departure delay." }),
       el("dt", { text: "Minimum volume" }), el("dd", { text: `Rankings include only groups with enough flights (${meta.min_flights || "airline/airport 100, route 50"}) to avoid unstable rates from tiny samples.` }),
       el("dt", { text: "Priority score" }), el("dd", { text: "Delay rate (%) × ln(1 + flights). A project-defined score balancing rate and volume; compare it with delay rate alone." }),
-      el("dt", { text: "Pipeline" }), el("dd", {}, "PySpark (local mode) reads the raw CSV, normalises column names, casts types, drops invalid and duplicate records, derives features, writes Parquet partitioned by month, and aggregates the summary CSVs in ", el("code", { text: "output/powerbi/" }), " (also used for Power BI)."),
-      el("dt", { text: "Limitations" }), el("dd", { text: "U.S. reporting carriers only; historical and descriptive — no prediction. Delay causes can be blank. High delay metrics flag a hotspot for investigation; they do not prove the airport or airline caused the delay." }))),
+      el("dt", { text: "Pipeline" }), el("dd", {}, "PySpark (local mode) reads the raw CSV, normalises column names, casts types, drops invalid and duplicate records, derives features, writes Parquet partitioned by month, and aggregates the summary CSVs in ", el("code", { text: datasetKey === "usa" ? "output/powerbi/" : `output/${datasetKey}/powerbi/` }), " (also used for Power BI)."),
+      el("dt", { text: "Limitations" }), el("dd", { text: meta.simulated ? "Simulated flight records calibrated to published DGCA on-time levels; patterns are realistic but individual numbers are not real observations. Descriptive only — no prediction." : "U.S. reporting carriers only; historical and descriptive — no prediction. Delay causes can be blank. High delay metrics flag a hotspot for investigation; they do not prove the airport or airline caused the delay." }))),
     ));
 
-  const footer = el("footer", {}, el("div", { class: "wrap", text: `Generated ${meta.generated_at || ""} from output/powerbi summary CSVs.` }));
+  const footer = el("footer", {}, el("div", { class: "wrap", text: `Generated ${meta.generated_at || ""} from ${datasetKey === "usa" ? "output/powerbi" : `output/${datasetKey}/powerbi`} summary CSVs.` }));
 
   app.append(header, nav, el("main", {}, overview, timeSection, airlineSection, airportSection, routeSection, causeSection, methodSection), footer);
   routeTable(routeTopHost);
