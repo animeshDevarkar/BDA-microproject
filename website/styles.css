@@ -172,6 +172,8 @@ nav.tabs a[aria-current="page"] { opacity: 1; background: rgba(242, 179, 61, .16
 
 /* Main ------------------------------------------------------------------------ */
 main { padding-block: 24px 48px; display: grid; gap: 20px; }
+main > section { min-width: 0; display: grid; gap: 20px; }
+#airport-detail, #airline-detail { min-width: 0; }
 .panel {
   background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
   padding: 20px; min-width: 0; box-shadow: var(--shadow);
