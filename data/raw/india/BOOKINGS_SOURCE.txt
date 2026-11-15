@@ -1,0 +1,8 @@
+Source: SIMULATED ticket bookings for India (not real bookings)
+Method: src/make_booking_data.py - routes and airlines in proportion to the flight records; ticket fares anchored on the pair's average fare in fares.csv and moved by cabin, days before departure, weekday and random variation; taxes, baggage and seat fees at approximate published levels
+Travel period: 2025-09-01 to 2026-08-31
+Generated: 2026-11-15
+Rows: 1,501,125 (including about 0.3% deliberately broken rows for the cleaning step)
+Routes: 2,755 route-airline combinations with fare data
+Seed: 2026
+Amounts: Indian rupees

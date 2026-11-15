@@ -57,6 +57,16 @@
   const DAY = ['', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
+  // Fare forecasts (written by src/fare_price_model.py). Fares are per airport pair, either direction.
+  const P = (window.PRICE_DATASETS || {})[DATASET] || null;
+  const pairKey = (o, d) => (o < d ? o + '-' + d : d + '-' + o);
+  const fareRows = P ? groupBy(rowsOf(P.pairs).map(r => Object.assign(r, { pair: keyOf(r.a, r.b) })), 'pair') : new Map();
+  const FARE_Q = P ? P.pairs.cols.slice(3, 3 + P.quarters.length) : [];
+
+  // Trip cost factors (written by src/trip_cost_model.py from the simulated ticket bookings).
+  const C = (window.COST_DATASETS || {})[DATASET] || null;
+  const costPairs = C ? new Map(rowsOf(C.pairs).map(r => [keyOf(r.a, r.b), r])) : new Map();
+
   // ---------------------------------------------------------------- helpers
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const fmtInt = n => Number(n).toLocaleString('en-US');
@@ -66,6 +76,13 @@
   const monthYear = ym => monthLabel(ym, true) + ' ' + ym.slice(0, 4);
   const cityOf = code => (airportBy.get(code) || {}).city || '';
   const shortCity = code => cityOf(code).split(',')[0].split('/')[0];
+  const fmtMoney = (() => {
+    if (!P) return v => String(v);
+    const nf = new Intl.NumberFormat(P.dataset.currency === 'INR' ? 'en-IN' : 'en-US', { style: 'currency', currency: P.dataset.currency, maximumFractionDigits: 0 });
+    return v => v == null ? '–' : nf.format(v);
+  })();
+  const QUARTER_MONTHS = ['Jan–Mar', 'Apr–Jun', 'Jul–Sep', 'Oct–Dec'];
+  const quarterLabel = ([y, q], long) => long ? `${QUARTER_MONTHS[q - 1]} ${y}` : `Q${q} ${y}`;
   const fmtDate = iso => { if (!iso) return ''; const [y, m, d] = iso.split('-'); return `${MONTH_NAMES[+m - 1].slice(0, 3)} ${+d}, ${y}`; };
 
   const store = {
@@ -73,6 +90,9 @@
     get(key, fallback, shared) { try { const v = localStorage.getItem('ontime.' + key + (shared ? '' : '.' + DATASET)); return v == null ? fallback : JSON.parse(v); } catch (e) { return fallback; } },
     set(key, value, shared) { try { localStorage.setItem('ontime.' + key + (shared ? '' : '.' + DATASET), JSON.stringify(value)); } catch (e) { /* storage blocked: keep working without it */ } },
   };
+
+  // The visitor's trip cost choices, remembered between visits.
+  const costOpts = Object.assign({ travellers: 1, roundTrip: false, cabin: 'Economy', lead: '21-59', weekday: '', bags: 0, seat: false, valueOfTime: '' }, store.get('cost', {}));
 
   let toastTimer;
   function toast(msg) {
@@ -113,6 +133,62 @@
     return { p, base, baseLabel, note, factors, route };
   }
 
+  /* Predicted fare for a trip: the chosen airline's forecast when the model has one, else all airlines.
+     A travel month picks its calendar quarter in the forecast; without one, the next quarter is used. */
+  function fareEstimate(s) {
+    const rows = P && fareRows.get(pairKey(s.from, s.to));
+    if (!rows) return null;
+    const market = rows.find(r => r.carrier === 'ALL');
+    const own = s.airline ? rows.find(r => r.carrier === s.airline) : null;
+    const row = own || market;
+    if (!row) return null;
+    const qi = s.month ? Math.max(0, P.quarters.findIndex(([, q]) => q === Math.ceil(+s.month.slice(5, 7) / 3))) : 0;
+    const fare = row[FARE_Q[qi]];
+    const [lo, hi] = P.model.interval;
+    const note = s.airline && !own ? `${airlineName(s.airline)} has no fare records for this airport pair (regional airlines usually sell under a partner's name), so the all-airline forecast is shown.` : '';
+    return { fare, low: Math.round(fare * lo), high: Math.round(fare * hi), qi, row, market, rows, label: own ? airlineName(s.airline) : 'All airlines', note };
+  }
+
+  /* Cost of the whole trip. The same sum as quote() in src/trip_cost_model.py:
+       ticket = predicted fare x cabin-and-booking-date index x weekday index (per traveller, per direction)
+       total  = (ticket + baggage + seat) x travellers x directions; taxes are a part of the ticket
+       delay  = chance of a late arrival x typical delay x value of time (time, not cash, so kept apart) */
+  function tripCost(s, o) {
+    const f = fareEstimate(s);
+    if (!C || !f) return null;
+    const cabins = (s.airline && C.airline_cabins[s.airline]) || C.cabins;
+    const cabin = cabins.includes(o.cabin) ? o.cabin : 'Economy';
+    const li = Math.max(0, C.lead_buckets.findIndex(b => b.key === o.lead));
+    const index = C.fare_index[cabin][li] ?? C.fare_index.Economy[li] ?? 1;
+    const day = o.weekday ? (C.weekday_index[+o.weekday - 1] || 1) : 1;
+    const travellers = Math.max(1, Math.min(9, +o.travellers || 1));
+    const directions = o.roundTrip ? 2 : 1, legs = travellers * directions;
+    const ticketEach = f.fare * index * day;
+    const [fixed, rate] = C.taxes[cabin] || [0, 0];
+    const taxEach = Math.max(0, Math.min(ticketEach, fixed + rate * ticketEach));
+    const own = s.airline && C.extras[s.airline];
+    const ex = own || C.extras.ALL || {};
+    const included = cabin === 'Business';   // business fares include bags and seats
+    const bagEach = included || !+o.bags ? 0 : ((+o.bags === 1 ? ex.one_bag : ex.two_bags) || 0);
+    const pair = costPairs.get(pairKey(s.from, s.to));
+    const seatEach = !o.seat || included ? 0
+      : pair && ex.seat_fixed != null ? Math.max(0, ex.seat_fixed + (ex.seat_per_mile || 0) * pair.miles) : (ex.seat || 0);
+    const hoursOf = e => e ? (e.p / 100) * (e.base.late_avg_min || 0) / 60 : 0;
+    const out = estimate(s);
+    const back = o.roundTrip ? (estimate({ from: s.to, to: s.from, airline: s.airline, hour: '', month: s.month }) || out) : null;
+    const delayHours = (hoursOf(out) + hoursOf(back)) * travellers;
+    const vot = o.valueOfTime === '' || o.valueOfTime == null || !(+o.valueOfTime >= 0) ? C.value_of_time : +o.valueOfTime;
+    const total = (ticketEach + bagEach + seatEach) * legs;
+    const [lo, hi] = P.model.interval;
+    return {
+      f, cabin, cabins, li, index, day, travellers, directions, legs, ticketEach, taxEach, bagEach, seatEach, included, pair,
+      extrasFrom: own ? airlineName(s.airline) : 'all airlines', taxRule: [fixed, rate],
+      ticket: ticketEach * legs, taxes: taxEach * legs, bags: bagEach * legs, seats: seatEach * legs, total,
+      low: (ticketEach * lo + bagEach + seatEach) * legs, high: (ticketEach * hi + bagEach + seatEach) * legs,
+      perTraveller: total / travellers, delayHours, delayCost: delayHours * vot, vot, cabinFallback: cabin !== o.cabin,
+    };
+  }
+
   // ---------------------------------------------------------------- charts
   function niceTicks(max, count = 4) {
     if (!(max > 0)) return [0, 1];
@@ -148,7 +224,7 @@
     const band = iw / items.length, bw = Math.max(4, band * 0.68);
     const every = items.length > 16 ? 3 : items.length > 8 ? 2 : 1;
     let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(opts.label || 'Bar chart')}">`;
-    ticks.forEach(t => { s += `<g class="tick"><line x1="${m.l}" x2="${W - m.r}" y1="${y(t)}" y2="${y(t)}"/><text x="${m.l - 6}" y="${y(t) + 4}" text-anchor="end">${t}%</text></g>`; });
+    ticks.forEach(t => { s += `<g class="tick"><line x1="${m.l}" x2="${W - m.r}" y1="${y(t)}" y2="${y(t)}"/><text x="${m.l - 6}" y="${y(t) + 4}" text-anchor="end">${opts.tickFmt ? opts.tickFmt(t) : t + '%'}</text></g>`; });
     items.forEach((d, i) => {
       const x = m.l + band * i + (band - bw) / 2;
       if (d.value != null) {
@@ -412,6 +488,8 @@
           </div>
         </aside>
       </article>
+      <section class="panel" id="fare-panel" aria-label="Predicted fare"></section>
+      <section class="panel" id="cost-panel" aria-label="Trip cost calculator"></section>
       <div class="grid-2">
         <section class="panel">
           <div class="panel-head"><h3>Airlines on this route</h3><p>Share of flights 15+ min late. Tap one to use it.</p></div>
@@ -470,6 +548,9 @@
       return { key: d, label: DAY[d], value: r ? r.late_pct : null, tip: r ? `<b>${DAY[d]}</b><br>${fmtPct(r.late_pct)} late · ${fmtInt(r.flights)} flights` : '' };
     }), { ref: from.late_pct, refLabel: `${s.from} average`, label: `Late arrival rate by weekday at ${s.from}`, height: 200 });
 
+    renderFare($('#fare-panel'), s);
+    renderCost($('#cost-panel'), s);
+
     $('#save-trip').addEventListener('click', () => {
       const list = loadTrips(); const id = tripId(s);
       if (list.some(t => tripId(t) === id)) { saveTrips(list.filter(t => tripId(t) !== id)); toast('Removed from My trips'); }
@@ -478,6 +559,150 @@
     });
     $('#share-trip').addEventListener('click', () => copyLink(s));
     $('#swap-trip').addEventListener('click', () => runSearch({ from: s.to, to: s.from, airline: '' }));
+  }
+
+  function renderFare(host, s) {
+    if (!P) { host.innerHTML = '<div class="notice small">Fare forecasts are missing. Run <span class="code">python src/fare_price_model.py</span> to create website/data/price-data-' + esc(DATASET) + '.js.</div>'; return; }
+    const f = fareEstimate(s);
+    if (!f) { host.innerHTML = `<div class="panel-head"><h3>Predicted fare</h3></div><p class="muted">No fare data for ${esc(s.from)} – ${esc(s.to)}, so the model cannot price this trip.</p>`; return; }
+    const quarter = P.quarters[f.qi];
+    const values = FARE_Q.map(k => f.row[k]);
+    const cheapest = values.indexOf(Math.min(...values));
+    const m = P.model;
+    const best = m.metrics.find(x => x.model === m.name) || m.metrics[0];
+    const others = f.rows.filter(r => r.carrier !== 'ALL').map(r => ({ code: r.carrier, fare: r[FARE_Q[f.qi]] })).sort((a, b) => a.fare - b.fare);
+    host.innerHTML = `
+      <div class="panel-head"><h3>Predicted fare</h3><p>AI forecast of the average one-way fare · ${esc(P.dataset.source)}</p></div>
+      ${P.dataset.simulated ? '<p class="small notice" style="margin-bottom:12px">Simulated fares: India has no public airport-pair fare file, so the model is trained on generated fares. Use the figure as a guide only.</p>' : ''}
+      <div class="grid-2">
+        <div style="display:grid;gap:10px;align-content:start">
+          <span class="label">${esc(f.label)} · ${esc(quarterLabel(quarter, true))}</span>
+          <div class="big-figure"><span class="value num">${fmtMoney(f.fare)}</span></div>
+          <p class="small muted">Typical range <b>${fmtMoney(f.low)} – ${fmtMoney(f.high)}</b>: 8 in 10 fares in the test quarters fell within this range of the prediction.${f.row.last_year != null ? ` Last reported year (to ${esc(m.last_period)}): ${fmtMoney(f.row.last_year)} on average.` : ''}</p>
+          ${!s.month ? `<p class="small muted">No travel month picked, so this is the next quarter. Cheapest in the forecast: <b>${esc(quarterLabel(P.quarters[cheapest], true))}</b> (${fmtMoney(values[cheapest])}).</p>` : ''}
+          ${f.note ? `<p class="small notice">${esc(f.note)}</p>` : ''}
+          <details class="explain">
+            <summary>How the fare was predicted</summary>
+            <ol>
+              <li>A <b>${esc(m.name)}</b> model (Spark MLlib) learned fares from ${fmtInt(m.train_rows + m.test_rows)} airport-pair, quarter and airline records.</li>
+              <li>Its inputs combine the fare records (distance, traffic, season, year, airline) with figures computed from ${fmtInt(OVERALL.flights)} flights: nonstop frequency, competing airlines, late and cancellation rates, and airport size.</li>
+              <li>Tested on ${esc(m.test_period.replace('-', ' to '))}, which it never saw during training: average error ${fmtPct(best.mape_pct)} (${fmtMoney(best.mae)}), R² ${best.r2.toFixed(2)}.</li>
+              <li>Fares are averages over all tickets sold, so the price on a given day can be higher or lower.</li>
+            </ol>
+          </details>
+        </div>
+        <div id="fare-chart"></div>
+      </div>
+      ${others.length > 1 ? `<div style="margin-top:16px"><div class="panel-head"><h3>Airlines by predicted fare</h3><p>${esc(quarterLabel(quarter, true))}. Tap one to use it.</p></div>
+        ${barList(others.map(o => ({ key: o.code, name: airlineName(o.code), value: o.fare, active: o.code === s.airline })), { fmt: fmtMoney, clickable: true })}</div>` : ''}`;
+    columnChart($('#fare-chart', host), P.quarters.map((qq, i) => ({
+      key: i, label: quarterLabel(qq), value: values[i], active: i === f.qi,
+      tip: `<b>${esc(quarterLabel(qq, true))}</b><br>${esc(f.label)}: ${fmtMoney(values[i])}<br>Range ${fmtMoney(Math.round(values[i] * m.interval[0]))} – ${fmtMoney(Math.round(values[i] * m.interval[1]))}`,
+    })), {
+      label: 'Predicted fare by quarter', tickFmt: fmtMoney, height: 200,
+      ref: f.row.last_year != null ? f.row.last_year : undefined, seriesLabel: 'Predicted fare', refLabel: 'Last reported year',
+      onPick: d => { const q = P.quarters[d.key][1]; const month = MONTHS.find(x => Math.ceil(+x.slice(5, 7) / 3) === q); if (month) runSearch({ month: s.month === month ? '' : month }); },
+    });
+    $$('.bar-row', host).forEach(btn => btn.addEventListener('click', () => runSearch({ airline: btn.dataset.key === s.airline ? '' : btn.dataset.key })));
+  }
+
+  function renderCost(host, s) {
+    if (!P || !fareEstimate(s)) { host.hidden = true; return; }   // no fare forecast, nothing to build on
+    host.hidden = false;
+    if (!C) { host.innerHTML = '<div class="notice small">Trip cost factors are missing. Run <span class="code">python src/make_booking_data.py</span> and <span class="code">python src/trip_cost_model.py</span> (add <span class="code">--dataset ' + esc(DATASET) + '</span>) to create website/data/cost-data-' + esc(DATASET) + '.js.</div>'; return; }
+    const o = costOpts;
+    const cabins = (s.airline && C.airline_cabins[s.airline]) || C.cabins;
+    const india = DS.key === 'india';
+    const bagChoices = india ? ['15 kg included only', '+5 kg extra', '+10 kg extra'] : ['No checked bag', '1 checked bag', '2 checked bags'];
+    const symbol = fmtMoney(0).replace(/[\d.,\s]/g, '');
+    const opt = (value, label, chosen) => `<option value="${esc(value)}"${String(value) === String(chosen) ? ' selected' : ''}>${esc(label)}</option>`;
+    host.innerHTML = `
+      <div class="panel-head"><h3>Trip cost calculator</h3><p>The fare forecast, adjusted with ${fmtInt(C.bookings)} ticket bookings processed in Spark</p></div>
+      <p class="small notice" style="margin-bottom:12px">The bookings are simulated${P.dataset.simulated ? ', like the fares' : ' (the fare forecast itself uses real U.S. DOT fares)'}. Treat the total as an estimate, not a quote.</p>
+      <div class="grid-2">
+        <form class="cost-form" id="cost-form" autocomplete="off">
+          <div class="field"><label for="cost-travellers">Travellers</label>
+            <select id="cost-travellers">${[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => opt(n, n === 1 ? '1 traveller' : n + ' travellers', o.travellers)).join('')}</select></div>
+          <div class="field"><span class="field-label" id="cost-trip-label">Trip</span>
+            <div class="seg" role="group" aria-labelledby="cost-trip-label">
+              <button type="button" data-rt="0" aria-pressed="${!o.roundTrip}">One way</button><button type="button" data-rt="1" aria-pressed="${!!o.roundTrip}">Round trip</button>
+            </div></div>
+          <div class="field"><label for="cost-cabin">Cabin</label>
+            <select id="cost-cabin">${cabins.map(c => opt(c, c, cabins.includes(o.cabin) ? o.cabin : 'Economy')).join('')}</select></div>
+          <div class="field"><label for="cost-lead">Booked before departure</label>
+            <select id="cost-lead">${C.lead_buckets.map(b => opt(b.key, b.label, o.lead)).join('')}</select></div>
+          <div class="field"><label for="cost-weekday">Day of travel</label>
+            <select id="cost-weekday">${opt('', 'Any day', o.weekday)}${[1, 2, 3, 4, 5, 6, 7].map(d => opt(d, DAY[d], o.weekday)).join('')}</select></div>
+          <div class="field"><label for="cost-bags">${india ? 'Extra baggage, each traveller' : 'Checked bags, each traveller'}</label>
+            <select id="cost-bags">${bagChoices.map((label, n) => opt(n, label, o.bags)).join('')}</select></div>
+          <div class="field"><label for="cost-vot">Value of your time, ${esc(symbol)} per hour</label>
+            <input id="cost-vot" type="number" min="0" step="any" inputmode="decimal" placeholder="${C.value_of_time}" value="${esc(o.valueOfTime)}"></div>
+          <label class="check"><input id="cost-seat" type="checkbox"${o.seat ? ' checked' : ''}> Paid seat selection</label>
+        </form>
+        <div id="cost-result" style="display:grid;gap:12px;align-content:start" aria-live="polite"></div>
+      </div>
+      <div style="margin-top:16px">
+        <div class="panel-head"><h3>When to book</h3><p id="cost-chart-sub"></p></div>
+        <div id="cost-chart"></div>
+      </div>`;
+
+    const update = () => {
+      store.set('cost', o);
+      const t = tripCost(s, o);
+      const quarter = P.quarters[t.f.qi];
+      const lead = C.lead_buckets[t.li];
+      const who = `${t.travellers} traveller${t.travellers > 1 ? 's' : ''} · ${o.roundTrip ? 'round trip' : 'one way'} · ${t.cabin}`;
+      const mins = Math.round(t.delayHours * 60);
+      $('#cost-result', host).innerHTML = `
+        <span class="label">Estimated total · ${esc(who)}</span>
+        <div class="big-figure"><span class="value num">${fmtMoney(t.total)}</span></div>
+        <p class="small muted">Likely between <b>${fmtMoney(t.low)}</b> and <b>${fmtMoney(t.high)}</b>${t.travellers > 1 ? ` · ${fmtMoney(t.perTraveller)} per traveller` : ''}.</p>
+        ${t.cabinFallback ? `<p class="small notice">${esc(airlineName(s.airline))} sells no ${esc(o.cabin)} seats in the bookings, so Economy is priced.</p>` : ''}
+        <div class="stat-list">
+          <div><span>Tickets <span class="small muted">${fmtMoney(t.ticketEach)} × ${t.legs}</span></span><strong>${fmtMoney(t.ticket)}</strong></div>
+          <div><span class="muted">of which taxes and airport fees</span><span class="muted num">${fmtMoney(t.taxes)}</span></div>
+          <div><span>${india ? 'Extra baggage' : 'Checked bags'}${t.bags ? ` <span class="small muted">${fmtMoney(t.bagEach)} × ${t.legs}</span>` : ''}</span><strong>${t.included && +o.bags ? 'Included' : fmtMoney(t.bags)}</strong></div>
+          <div><span>Seat selection${t.seats ? ` <span class="small muted">${fmtMoney(t.seatEach)} × ${t.legs}</span>` : ''}</span><strong>${t.included && o.seat ? 'Included' : fmtMoney(t.seats)}</strong></div>
+          <div><span><b>Total to pay</b></span><strong>${fmtMoney(t.total)}</strong></div>
+        </div>
+        <p class="small muted">Delay risk: expect about <b>${mins} min</b> of delay over the trip on average${t.travellers > 1 ? ', all travellers together' : ''}. At ${fmtMoney(t.vot)} per hour that time is worth <b>${fmtMoney(t.delayCost)}</b>. It is not money you pay, so it is kept out of the total.</p>
+        <details class="explain">
+          <summary>How the cost was worked out</summary>
+          <ol>
+            <li>Predicted fare, ${esc(t.f.label)}, ${esc(quarterLabel(quarter, true))}: <b>${fmtMoney(t.f.fare)}</b> one way. This is an average over every cabin and booking date.</li>
+            <li>${esc(t.cabin)} booked ${esc(lead.label)} ahead: × ${t.index.toFixed(2)}. Each booking's fare was divided by the average for its airport pair and airline, then averaged by cabin and booking date.</li>
+            ${o.weekday ? `<li>Travelling on a ${DAY[+o.weekday]}: × ${t.day.toFixed(2)}.</li>` : ''}
+            <li>Ticket: ${fmtMoney(t.ticketEach)} per traveller each way, × ${t.travellers} traveller${t.travellers > 1 ? 's' : ''}${o.roundTrip ? ' × 2 directions' : ''} = <b>${fmtMoney(t.ticket)}</b>.</li>
+            <li>Taxes and airport fees are already inside the ticket price: about ${fmtMoney(t.taxRule[0])} plus ${fmtPct(t.taxRule[1] * 100)} of each ticket, a line fitted to the bookings.</li>
+            <li>Baggage and seat fees are the averages paid on ${esc(t.extrasFrom)}${t.pair ? `; the seat fee rises with the ${fmtInt(t.pair.miles)}-mile distance` : ''}.</li>
+            ${t.pair ? `<li>For comparison, the ${fmtInt(t.pair.bookings)} bookings on this airport pair paid ${fmtMoney(t.pair.cost_per_leg)} per traveller each way on average, extras included.</li>` : ''}
+          </ol>
+        </details>`;
+      const values = C.lead_buckets.map((b, i) => { const x = C.fare_index[t.cabin][i]; return x == null ? null : t.f.fare * x * t.day; });
+      const known = values.filter(v => v != null);
+      const cheapest = values.indexOf(Math.min(...known));
+      $('#cost-chart-sub', host).innerHTML = `${esc(t.cabin)} ticket per traveller, one way, by days between booking and departure. Cheapest: <b>${esc(C.lead_buckets[cheapest].label)}</b> ahead (${fmtMoney(values[cheapest])}). Tap a bar to use it.`;
+      columnChart($('#cost-chart', host), C.lead_buckets.map((b, i) => ({
+        key: b.key, label: b.label, short: b.key + ' days', value: values[i], active: i === t.li,
+        tip: `<b>${esc(b.label)} ahead</b><br>${fmtMoney(values[i])} per traveller, one way`,
+      })), { label: 'Ticket price by days booked before departure', tickFmt: fmtMoney, height: 200, onPick: d => { o.lead = d.key; $('#cost-lead', host).value = d.key; update(); } });
+    };
+
+    const bind = (sel, key, read) => $(sel, host).addEventListener('change', e => { o[key] = read(e.target); update(); });
+    bind('#cost-travellers', 'travellers', el => +el.value);
+    bind('#cost-cabin', 'cabin', el => el.value);
+    bind('#cost-lead', 'lead', el => el.value);
+    bind('#cost-weekday', 'weekday', el => el.value);
+    bind('#cost-bags', 'bags', el => +el.value);
+    bind('#cost-seat', 'seat', el => el.checked);
+    $('#cost-vot', host).addEventListener('input', e => { o.valueOfTime = e.target.value; update(); });
+    $('#cost-form', host).addEventListener('submit', e => e.preventDefault());
+    $$('.seg button', host).forEach(b => b.addEventListener('click', () => {
+      o.roundTrip = b.dataset.rt === '1';
+      $$('.seg button', host).forEach(x => x.setAttribute('aria-pressed', String((x.dataset.rt === '1') === o.roundTrip)));
+      update();
+    }));
+    update();
   }
 
   function shareUrl(s) {
@@ -643,7 +868,7 @@
           <div class="route code">${t.from} → ${t.to}</div>
           <div class="small muted">${esc(shortCity(t.from))} to ${esc(shortCity(t.to))} · ${esc(t.airline ? airlineName(t.airline) : 'Any airline')}${t.hour !== '' ? ' · ' + fmtHour(+t.hour) : ''}${t.month ? ' · ' + monthLabel(t.month) : ''}</div>
           ${e ? `<div class="big-figure"><span class="value num" style="font-size:2.6rem">${Math.round(e.p)}<small style="font-size:1.3rem">%</small></span>${statusPill(e.p)}</div>
-          <div class="small muted">chance of 15+ min late · ${fmtPct(e.base.cancel_pct)} cancelled</div>` : '<p class="notice small">No data for this route.</p>'}
+          <div class="small muted">chance of 15+ min late · ${fmtPct(e.base.cancel_pct)} cancelled${(f => f ? ` · fare about <b>${fmtMoney(f.fare)}</b>` : '')(fareEstimate(t))}</div>` : '<p class="notice small">No data for this route.</p>'}
           <label class="small muted" for="note-${i}">Your note</label>
           <input id="note-${i}" class="note" type="text" maxlength="120" placeholder="e.g. Mum's birthday, 12 May" value="${esc(t.note || '')}" style="height:36px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:0 10px;font:inherit">
           <div class="actions"><button class="btn small primary" type="button" data-act="open">Open</button><button class="btn small" type="button" data-act="share">Copy link</button><button class="btn small ghost" type="button" data-act="remove">Remove</button></div>
@@ -689,6 +914,21 @@
         <li>If you pick a departure time or month, the rate is scaled by how that hour or month compares with the rest of the year at your departure airport.</li>
         <li>Routes need at least ${OVERALL.min_flights.route} flights and airports ${OVERALL.min_flights.airport} departures to be shown, so small samples don't give misleading odds.</li>
       </ul>
+      ${P ? `<h3>How the fare prediction works</h3>
+      <ul>
+        <li>Fares come from ${P.dataset.simulated ? '<b>simulated</b> airport-pair fares in the layout of the U.S. DOT fare report (India has no public fare file)' : 'the <b>U.S. DOT Consumer Airfare Report</b>, which averages every domestic airport pair each quarter from a 10% sample of tickets'}.</li>
+        <li>Apache Spark joins them with figures from the flight records (nonstop frequency, competing airlines, delays, airport size) and trains three models: ${P.model.metrics.map(x => `${esc(x.model)} (error ${fmtPct(x.mape_pct)})`).join(', ')}. The most accurate on the held-out quarters ${esc(P.model.test_period.replace('-', ' to '))}, <b>${esc(P.model.name)}</b>, makes the forecast.</li>
+        ${P.model.importance.length ? `<li>What moves the price most: ${P.model.importance.slice(0, 4).map(([n, v]) => `${esc(n.toLowerCase())} (${fmtPct(v * 100, 0)})`).join(', ')}.</li>` : ''}
+        <li>The forecast covers ${esc(quarterLabel(P.quarters[0], true))} to ${esc(quarterLabel(P.quarters[P.quarters.length - 1], true))}. It is an average fare, not a quote: booking date, cabin and the day of travel change what you pay.</li>
+      </ul>` : ''}
+      ${P && C ? `<h3>How the trip cost is worked out</h3>
+      <ul>
+        <li>The calculator starts from the predicted fare and builds the cost of the whole trip: tickets for every traveller and direction, taxes, baggage and seat fees.</li>
+        <li>The adjustments come from <b>${fmtInt(C.bookings)} simulated ticket bookings</b> (${fmtInt(C.raw_rows - C.bookings)} broken rows were removed in cleaning). No public file lists single bookings with cabin, booking date and fees, so they are generated on this site's routes and airlines, with fares anchored on the fare data and fees at roughly published levels.</li>
+        <li>Spark divides each booking's fare by the average for its airport pair and airline, then averages that index by cabin, by days booked ahead and by weekday. Example: economy bought in the last 2 days costs × ${C.fare_index.Economy[0].toFixed(2)}, and × ${C.fare_index.Economy[4].toFixed(2)} when bought 3–8 weeks ahead.</li>
+        <li>Taxes come from a line fitted per cabin. They are already part of the ticket price, so they are shown but not added again.</li>
+        <li>The delay risk multiplies the chance of a late arrival by the typical delay on your route, from the flight records, and by the value you give an hour of your time. It is time, not cash, so it stays out of the total.</li>
+      </ul>` : ''}
       <h3>Good to know</h3>
       <ul>
         <li>Across ${VS_REGION}, ${fmtPct(OVERALL.late_pct)} of flights arrived late and ${fmtPct(OVERALL.cancel_pct)} were cancelled.</li>
@@ -732,8 +972,8 @@
     ? `Data: simulated Indian domestic flights calibrated to DGCA on-time performance, ${fmtDate(OVERALL.first_date)} – ${fmtDate(OVERALL.last_date)} (${fmtInt(OVERALL.flights)} flights). Not real flight records.`
     : `Data: U.S. DOT Bureau of Transportation Statistics, ${fmtDate(OVERALL.first_date)} – ${fmtDate(OVERALL.last_date)} (${fmtInt(OVERALL.flights)} flights).`;
   $('#hero-lede').textContent = DS.simulated
-    ? 'Pick two Indian airports and we look up every flight on that route in a year of simulated domestic records calibrated to DGCA on-time data. You get the odds of a 15-minute-plus delay, the most reliable airline and the best time of day to fly.'
-    : 'Pick your airports and we look up every flight on that route from the last year of official U.S. on-time records. You get the odds of a 15-minute-plus delay, the most reliable airline and the best time of day to fly.';
+    ? 'Pick two Indian airports and we look up every flight on that route in a year of simulated domestic records calibrated to DGCA on-time data. You get the odds of a 15-minute-plus delay, the most reliable airline, the best time of day to fly, an AI forecast of the fare and the cost of the whole trip.'
+    : 'Pick your airports and we look up every flight on that route from the last year of official U.S. on-time records. You get the odds of a 15-minute-plus delay, the most reliable airline, the best time of day to fly, an AI forecast of the fare and the cost of the whole trip.';
   $('#sim-banner').hidden = !DS.simulated;
   document.title = DATASET === 'usa' ? 'OnTime Check' : `OnTime Check · ${DS.country}`;
 

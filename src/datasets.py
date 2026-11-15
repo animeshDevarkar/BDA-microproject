@@ -19,11 +19,15 @@ class Dataset:
     region_name: str   # used in sentences: "U.S. average", "India average"
     source_name: str   # short source label for the UI
     simulated: bool
+    currency: str      # fares: "USD" / "INR"
+    fare_source: str   # short fare source label for the UI
 
 
 DATASETS = {
-    "usa": Dataset("usa", "International", "USA", "U.S.", "U.S. BTS On-Time Performance", False),
-    "india": Dataset("india", "Domestic", "India", "India", "Simulated, calibrated to DGCA on-time data", True),
+    "usa": Dataset("usa", "International", "USA", "U.S.", "U.S. BTS On-Time Performance", False,
+                   "USD", "U.S. DOT Consumer Airfare Report (Table 1a)"),
+    "india": Dataset("india", "Domestic", "India", "India", "Simulated, calibrated to DGCA on-time data", True,
+                     "INR", "Simulated, calibrated to published Indian domestic fare levels"),
 }
 DEFAULT = "usa"
 
@@ -45,4 +49,12 @@ def paths(key: str, root: Path) -> dict[str, Path]:
         "run_summary": output / "run_summary.txt",
         "dashboard_data": root / "dashboard" / f"data-{key}.js",
         "website_data": root / "website" / "data" / f"site-data-{key}.js",
+        "fares_input": raw / "fares.csv",
+        "fares_source": raw / "FARES_SOURCE.txt",
+        "fare_model": output / "models" / "fare_model",
+        "price_data": root / "website" / "data" / f"price-data-{key}.js",
+        "bookings_input": raw / "bookings.csv",
+        "bookings_source": raw / "BOOKINGS_SOURCE.txt",
+        "bookings_processed": processed.parent / "bookings_clean",
+        "cost_data": root / "website" / "data" / f"cost-data-{key}.js",
     }

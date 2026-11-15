@@ -252,6 +252,206 @@ def test_india_simulation_is_valid_and_calibrated(spark, tmp_path):
     assert {"IndiGo", "Air India", "SpiceJet"} <= names
 
 
+def fare_rows(quarters: list[tuple[int, int]], seed: int) -> list[list]:
+    """Table 1a-style fares for every pair of the sample airports: distance, season and airline effects."""
+    import random
+    from make_sample_data import AIRPORTS
+
+    rng = random.Random(seed)
+    codes = sorted(AIRPORTS)
+    pairs = [(a, b) for i, a in enumerate(codes) for b in codes[i + 1:]]
+    rows = []
+    for k, (a, b) in enumerate(pairs):
+        miles = 300 + 97 * k % 2200
+        for year, quarter in quarters:
+            base = (60 + 0.16 * miles) * (1.15 if quarter == 3 else 1.0) * (1.02 ** (year - 2022))
+            fare_lg, fare_low = base * 1.1 * rng.uniform(0.97, 1.03), base * 0.8 * rng.uniform(0.97, 1.03)
+            rows.append([year, quarter, b, a, a, b, miles, 500 + 10 * k, round((fare_lg + fare_low) / 2, 2),
+                         "DL", 0.6, round(fare_lg, 2), "WN" if k % 3 else "DL", 0.4, round(fare_low, 2)])
+    return rows
+
+
+def test_fare_labels_are_one_row_per_pair_quarter_and_airline(spark, tmp_path):
+    import fare_price_model as fares
+    from download_fare_data import COLUMNS as FARE_COLUMNS
+
+    rows = [[2024, 1, "LAX", "JFK", "Los Angeles", "New York", 2475, 900, 300, "DL", 0.5, 340, "B6", 0.3, 250],
+            [2024, 1, "ATL", "ORD", "Atlanta", "Chicago", 606, 700, 200, "DL", 0.6, 210, "DL", 0.6, 210],
+            [2024, 1, "ATL", "ATL", "Atlanta", "Atlanta", 10, 5, 99, "DL", 1, 99, "DL", 1, 99],   # same airport
+            [2024, 5, "ATL", "DEN", "Atlanta", "Denver", 1199, 400, 250, "DL", 0.6, 260, "UA", 0.3, 230]]  # bad quarter
+    df = fares.load_fares(spark, write_csv(tmp_path / "fares.csv", FARE_COLUMNS, rows))
+    got = {(r.airport_a, r.airport_b, r.carrier): r.fare for r in df.collect()}
+    # Pairs are unordered (JFK < LAX); the market average is the "ALL" airline.
+    assert got == {("JFK", "LAX", "ALL"): 300, ("JFK", "LAX", "DL"): 340, ("JFK", "LAX", "B6"): 250,
+                   ("ATL", "ORD", "ALL"): 200, ("ATL", "ORD", "DL"): 210}
+    assert {r.period for r in df.collect()} == {2024 * 4}
+    with pytest.raises(FileNotFoundError):
+        fares.load_fares(spark, tmp_path / "missing.csv")
+
+
+def test_fare_model_trains_forecasts_and_exports(spark, tmp_path):
+    from pyspark.ml import PipelineModel
+    import fare_price_model as fares
+    from download_fare_data import COLUMNS as FARE_COLUMNS
+
+    quarters = [(y, q) for y in (2022, 2023, 2024) for q in (1, 2, 3, 4)]
+    fare_csv = write_csv(tmp_path / "fares.csv", FARE_COLUMNS, fare_rows(quarters, seed=4))
+    flights = pipeline.load_and_standardize(
+        spark, write_csv(tmp_path / "flights.csv", COLUMNS, random_rows(8000, 2024, seed=9))).cache()
+    locations = {"fare_model": tmp_path / "model", "summaries": tmp_path / "powerbi",
+                 "price_data": tmp_path / "price-data-usa.js"}
+
+    result = fares.run(spark, "usa", fare_csv, flights, locations, fast=True)
+
+    assert result["test_period"] == "2024Q1-2024Q4"
+    assert {r["name"] for r in result["results"]} == set(fares.candidate_models(32))
+    assert result["best"]["mape_pct"] < 10  # fares follow distance and season closely
+    low, high = result["interval"]
+    assert 0 < low <= 1 <= high
+    for name in ("fare_model_metrics.csv", "fare_feature_importance.csv", "fare_forecast.csv", "fare_trend.csv"):
+        assert (tmp_path / "powerbi" / name).stat().st_size > 0, name
+    assert PipelineModel.load(str(tmp_path / "model")).stages
+
+    data = read_registered_js(tmp_path / "price-data-usa.js", "PRICE_DATASETS", "usa")
+    assert data["dataset"]["currency"] == "USD"
+    assert data["quarters"] == [[2025, 1], [2025, 2], [2025, 3], [2025, 4]]  # the 4 quarters after the data
+    cols = data["pairs"]["cols"]
+    assert cols == ["a", "b", "carrier", "2025Q1", "2025Q2", "2025Q3", "2025Q4", "last_year"]
+    rows = [dict(zip(cols, r)) for r in data["pairs"]["rows"]]
+    assert all(r["a"] < r["b"] for r in rows)
+    assert {r["carrier"] for r in rows} >= {"ALL", "DL"}
+    assert all(r[q] > 0 for r in rows for q in cols[3:7])
+    # Longer pairs cost more, and the summer quarter more than spring, as in the training data.
+    market = {(r["a"], r["b"]): r for r in rows if r["carrier"] == "ALL"}
+    jfk_lax, atl_mco = market[("JFK", "LAX")], market[("ATL", "MCO")]
+    miles = {(a, b): m for a, b, m in ((r[3], r[2], r[6]) for r in fare_rows([(2024, 1)], 0))}
+    longer, shorter = sorted([jfk_lax, atl_mco], key=lambda r: -miles[(r["a"], r["b"])])
+    assert longer["2025Q1"] > shorter["2025Q1"]
+    assert sum(r["2025Q3"] > r["2025Q2"] for r in market.values()) > 0.8 * len(market)
+
+
+def test_india_fares_are_reproducible_and_priced_by_airline():
+    import pandas as pd
+    import make_india_fares as india_fares
+    from download_fare_data import COLUMNS as FARE_COLUMNS
+
+    mix = pd.DataFrame({"a": ["BOM", "BOM", "BOM", "IXL", "BLR"], "b": ["DEL", "DEL", "DEL", "DEL", "MAA"],
+                        "Reporting_Airline": ["6E", "AI", "QP", "6E", "6E"], "flights": [600, 300, 100, 50, 400]})
+    frame = india_fares.generate(mix, (2022, 1), (2023, 4), seed=1)
+    assert frame.equals(india_fares.generate(mix, (2022, 1), (2023, 4), seed=1))
+    assert list(frame.columns) == FARE_COLUMNS
+    assert len(frame) == 3 * 8
+    bom_del = frame[(frame.airport_1 == "BOM") & (frame.airport_2 == "DEL")]
+    assert (bom_del.carrier_lg == "6E").all()
+    # Akasa only flies from 2022Q3, so it cannot be the low-fare airline before then.
+    early = bom_del[(bom_del.year == 2022) & (bom_del.quarter <= 2)]
+    assert not (early.carrier_low == "QP").any()
+    assert ((frame.fare > 0) & (frame.fare_low <= frame.fare_lg * 1.2)).all()
+    # Delhi-Mumbai (about 700 miles) costs more than Bengaluru-Chennai (about 180 miles).
+    blr_maa = frame[(frame.airport_1 == "BLR") & (frame.airport_2 == "MAA")]
+    assert bom_del.fare.mean() > blr_maa.fare.mean() * 1.5
+    assert 680 < india_fares.great_circle_miles("BOM", "DEL") < 730
+
+
+# --- Trip cost ---------------------------------------------------------------------
+
+def booking_inputs():
+    """A small route mix and fare anchors on the sample airports, for the booking generator."""
+    import pandas as pd
+    import make_booking_data as booking_data
+
+    mix = pd.DataFrame({"origin": ["ATL", "LAX", "JFK", "LAX", "ATL", "ORD"],
+                        "destination": ["LAX", "ATL", "LAX", "JFK", "ORD", "ATL"],
+                        "airline": ["DL", "DL", "NK", "DL", "WN", "DL"], "flights": [900, 900, 400, 700, 500, 300]})
+    anchors = pd.DataFrame([{"a": a, "b": b, "quarter": q, "nsmiles": miles, "fare": fare, "carrier_lg": "DL",
+                             "fare_lg": fare * 1.05, "carrier_low": "NK", "fare_low": fare * 0.6}
+                            for a, b, miles, fare in (("ATL", "LAX", 1946, 320.0), ("JFK", "LAX", 2475, 380.0),
+                                                      ("ATL", "ORD", 606, 190.0)) for q in (1, 2, 3, 4)])
+    return booking_data.priced_routes(mix, anchors)
+
+
+def test_bookings_are_reproducible_and_add_up():
+    import pandas as pd
+    import make_booking_data as booking_data
+
+    routes, anchor = booking_inputs()
+    assert len(routes) == 6 and anchor.shape == (6, 4)
+    args = (routes, anchor, "usa", 6000, date(2025, 9, 1), date(2026, 8, 31), 7)
+    frame = pd.concat(booking_data.generate(*args, dirty=False), ignore_index=True)
+    assert frame.equals(pd.concat(booking_data.generate(*args, dirty=False), ignore_index=True))
+    assert list(frame.columns) == booking_data.COLUMNS and len(frame) == 6000
+    legs = frame.passengers * frame.trip_type.map({"ONE_WAY": 1, "ROUND_TRIP": 2})
+    assert ((frame.ticket_fare * legs + frame.baggage_fee + frame.seat_fee - frame.total_paid).abs() < 0.01).all()
+    assert ((frame.taxes_fees > 15.30) & (frame.taxes_fees < frame.ticket_fare)).all()
+    lead = (pd.to_datetime(frame.travel_date) - pd.to_datetime(frame.booking_date)).dt.days
+    assert (lead == frame.days_before_departure).all() and lead.min() >= 0
+    # Southwest and Spirit sell economy only; business fares include the bags.
+    assert set(frame[frame.airline.isin(["WN", "NK"])].cabin) == {"Economy"}
+    assert (frame[frame.cabin == "Business"].baggage_fee == 0).all()
+    economy = frame[(frame.cabin == "Economy") & (frame.airline == "DL")]
+    assert economy[lead[economy.index] <= 2].ticket_fare.mean() > 1.3 * economy[lead[economy.index] >= 21].ticket_fare.mean()
+    dirty = pd.concat(booking_data.generate(*args), ignore_index=True)
+    assert len(dirty) > len(frame) and dirty.booking_id.duplicated().any() and (dirty.ticket_fare < 0).any()
+
+
+def test_trip_cost_cleans_bookings_and_recovers_the_factors(spark, tmp_path):
+    import make_booking_data as booking_data
+    import trip_cost_model as trip_cost
+
+    routes, anchor = booking_inputs()
+    csv_path = tmp_path / "bookings.csv"
+    for i, frame in enumerate(booking_data.generate(routes, anchor, "usa", 40000, date(2024, 1, 1),
+                                                    date(2024, 12, 31), seed=5, chunk=20000)):
+        frame.to_csv(csv_path, index=False, mode="w" if i == 0 else "a", header=i == 0)
+    flights = pipeline.load_and_standardize(
+        spark, write_csv(tmp_path / "flights.csv", COLUMNS, random_rows(8000, 2024, seed=9)))
+    locations = {"bookings_processed": tmp_path / "bookings_clean", "summaries": tmp_path / "powerbi",
+                 "cost_data": tmp_path / "cost-data-usa.js"}
+
+    result = trip_cost.run(spark, "usa", csv_path, flights, locations)
+
+    quality = result["quality"]
+    assert quality["raw_rows"] == 40000 + 2 * 15          # each chunk breaks 60 rows; 15 of them are added duplicates
+    assert quality["clean_rows"] == 40000 - 2 * 45        # the other 3 kinds of broken row each lose a booking
+    assert {quality[k] for k in ("missing_route_or_airline", "invalid_dates", "invalid_amounts",
+                                 "duplicate_rows")} == {30}
+    assert list((tmp_path / "bookings_clean").glob("year_month=*/*.parquet"))
+    for name in trip_cost.CSV_TABLES.values():
+        assert (tmp_path / "powerbi" / name).stat().st_size > 0, name
+
+    data = read_registered_js(tmp_path / "cost-data-usa.js", "COST_DATASETS", "usa")
+    assert data["bookings"] == quality["clean_rows"] and data["dataset"]["currency"] == "USD"
+    assert data["cabins"] == ["Economy", "Premium Economy", "Business"]
+    economy, business = data["fare_index"]["Economy"], data["fare_index"]["Business"]
+    assert economy[0] > economy[2] > economy[4]                      # late bookings cost more
+    assert all(b > e for b, e in zip(business, economy))             # business costs more than economy
+    days = data["weekday_index"]
+    assert days[1] < days[4] < days[6]                               # Tue < Fri < Sun, as generated
+    fixed, rate = data["taxes"]["Economy"]
+    assert fixed == pytest.approx(15.30 / 1.075, abs=0.3) and rate == pytest.approx(0.075 / 1.075, abs=0.002)
+    assert data["extras"]["DL"]["one_bag"] == pytest.approx(35, abs=1.5)
+    assert data["extras"]["NK"]["one_bag"] > data["extras"]["DL"]["one_bag"]
+    assert data["airline_cabins"]["NK"] == ["Economy"]
+    pairs = {(r[0], r[1]): r for r in data["pairs"]["rows"]}
+    assert pairs[("ATL", "LAX")][2] == 1946 and set(pairs) == {("ATL", "LAX"), ("JFK", "LAX"), ("ATL", "ORD")}
+    # Routes are joined with the delay figures of the same route in the flight records.
+    route = {r["route"]: r for r in result["tables"]["routes"].collect()}["ATL-LAX"]
+    assert route["flights"] > 0 and route["cost_with_delay"] >= route["cost_per_traveller_direction"]
+
+    # The calculation: 2 travellers, round trip, one bag each, booked 3-6 days ahead.
+    q = trip_cost.quote(data, 300.0, airline="DL", lead="3-6", travellers=2, round_trip=True, bags=1,
+                        late_pct=20, late_avg_min=60, value_of_time=30)
+    assert q["ticket"] == pytest.approx(300 * economy[1] * 4, abs=0.01)
+    assert q["baggage"] == pytest.approx(data["extras"]["DL"]["one_bag"] * 4, abs=0.01)
+    assert q["total"] == pytest.approx(q["ticket"] + q["baggage"], abs=0.01) and q["per_traveller"] == pytest.approx(q["total"] / 2, abs=0.01)
+    assert 0 < q["taxes_included"] < q["ticket"]
+    assert q["expected_delay_hours"] == pytest.approx(0.2 * 4) and q["delay_time_cost"] == pytest.approx(24)
+    included = trip_cost.quote(data, 300.0, airline="DL", cabin="Business", bags=2, seat=True)
+    assert included["baggage"] == 0 and included["seats"] == 0 and included["total"] > q["total"] / 4
+    with pytest.raises(FileNotFoundError):
+        trip_cost.load_bookings(spark, tmp_path / "missing.csv")
+
+
 def test_dataset_paths_keep_usa_layout(tmp_path):
     import datasets
 

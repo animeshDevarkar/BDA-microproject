@@ -1,0 +1,7 @@
+Source: SIMULATED Indian domestic airport-pair fares (not real ticket prices)
+Method: src/make_india_fares.py - distance-based fare curve, airline, competition, season and history effects on the simulated flight network; same columns as U.S. DOT Table 1a
+Period: 2015Q1 to 2026Q2
+Downloaded: 2026-10-28
+Rows: 15,390
+Seed: 2026
+Fares: average one-way fare in Indian rupees

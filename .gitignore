@@ -8,3 +8,4 @@ output/**/*_spark_tmp/
 *.crc
 .vercel/
 .netlify/
+output/**/models/

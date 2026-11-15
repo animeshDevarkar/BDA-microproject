@@ -1,0 +1,4 @@
+model,rmse,mae,mape_pct,r2,train_rows,test_rows,test_period,selected
+Linear regression (baseline),60.60,39.41,15.22,0.49,200484,20182,2025Q2-2026Q1,false
+Random forest,48.51,30.47,11.84,0.68,200484,20182,2025Q2-2026Q1,true
+Gradient-boosted trees,100.82,31.51,12.25,-0.40,200484,20182,2025Q2-2026Q1,false

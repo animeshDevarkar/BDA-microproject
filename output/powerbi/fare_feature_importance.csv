@@ -1,0 +1,17 @@
+feature,importance_pct
+Airline,32.47
+Distance,19.42
+Airport A,12.49
+Airport B,12.12
+Year,6.76
+Nonstop flights on the pair,4.96
+Pair late-arrival rate,2.44
+Passengers per day,2.02
+Airlines competing on the pair,1.78
+Airline network size,1.37
+Size of the bigger airport,1.33
+Size of the smaller airport,0.93
+Pair cancellation rate,0.65
+Airline's flights on the pair,0.60
+Quarter (season),0.34
+Airline's late rate on the pair,0.32

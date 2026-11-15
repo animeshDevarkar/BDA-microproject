@@ -1,0 +1,6 @@
+Source: U.S. DOT Consumer Airfare Report, Table 1a - All U.S. Airport Pair Markets
+URL: https://data.transportation.gov/d/tfrh-tu9e
+Period: 2015Q1 to 2026Q1
+Downloaded: 2026-10-28
+Rows: 89,864
+Fares: average one-way fare in U.S. dollars (not inflation-adjusted)
