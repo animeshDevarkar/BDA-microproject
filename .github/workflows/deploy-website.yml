@@ -25,8 +25,16 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
-      - name: Check the data file exists
-        run: test -s website/data/site-data.js || (echo "Run the pipeline locally and commit website/data/site-data.js" && exit 1)
+      - name: Check the data files exist
+        run: |
+          missing=0
+          for f in site-data-usa site-data-india price-data-usa price-data-india cost-data-usa cost-data-india; do
+            if [ ! -s "website/data/$f.js" ]; then
+              echo "::error::Missing website/data/$f.js - run the pipeline locally and commit it"
+              missing=1
+            fi
+          done
+          exit $missing
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
